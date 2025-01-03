@@ -3,34 +3,30 @@ requires = ["setuptools>=64", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bench-agents"
+name = "agents-lab"
 dynamic = ["version"]
 description = "Testing agents framework and techniques"
 authors = [
     { name="Vincent Maladiere", email="maladiere.vincent@gmail.com"},
 ]
 requires-python = ">=3.12"
-dependencies = [
-    "numpy>=1.23.5",
-    "pandas>=1.5.3",
-    "scipy>=1.9.3",
-    "matplotlib>=3.4.3",
-]
+dependencies = []
 
 [tool.setuptools.dynamic]
 version = { file = "VERSION.txt" }
 
 [project.optional-dependencies]
-dev = [
-    "ipykernel",
-    "ipython",
-    "jupyterlab",
-]
 
-langgraph = [
-    "langgraph",
-    "langsmith",
-    "langchain-huggingface",
-    "tavily-python",
-    "langchain_community",
+doc = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "sphinx-gallery",
+    "sphinx-design",
+    "sphinx-copybutton",
+    "numpydoc",
+    "pydantic-ai",
+    "nest_asyncio",
+    "selenium",
+    "requests",
+    "beautifulsoup4",
 ]

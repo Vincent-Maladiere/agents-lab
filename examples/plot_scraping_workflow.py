@@ -1,8 +1,8 @@
 
 """
-=================
-Scraping workflow
-=================
+=====================
+Web Scraping Workflow
+=====================
 
 In this notebook, we explore how `Pydantic-AI <https://ai.pydantic.dev/>`_ workflows
 can help us extract structured information from HTML pages. This example can be run
@@ -57,7 +57,7 @@ Currently, the main limitations of the screenshot-based approach include:
 - Limited choice of visual LLM. Since high definition screenshots are needed to read
   text, only GPT4-V and GPT4-o are adapted to perform these benchmarks.
 - Limited use of textual information and HTML DOMs, screenshots rely heavily on visual
-data, while textual information and HTML DOMs remain LLMs' primary mode of operation.
+  data, while textual information and HTML DOMs remain LLMs' primary mode of operation.
 
 Our use-case is simpler than WebVoyager, as it does not require performing actions or
 navigating accross multiple websites. Instead, we deal with a few web pages processed
@@ -95,8 +95,8 @@ Our workflow is the following:
       H --> |Extract company financial info|J[Finish]
 
 
-Our webdriver uses a mix of ``requests`` for static pages (LBC) and ``selenium`` where
-Javascript need to be enabled to access pages (pappers).
+Our webdriver uses a mix of ``requests`` for static pages (on LBC) and ``selenium`` where
+Javascript need to be enabled to access pages (on Pappers).
 
 We define our HTML fetching functions below:
 """
@@ -178,7 +178,7 @@ def parse_html(html):
 # which will be produced in the next cell.
 
 def print_with_token_count(text):
-    print(f"token numbers: {len(text):,}\n")
+    print(f"character numbers: {len(text):,}\n")
     print(text)
 
 
@@ -195,6 +195,7 @@ print_with_token_count(text_content_lbc)
 #   to structuring responses, requiring less boilerplate compared to alternatives
 #   like LangChain.
 
+from pprint import pprint
 import nest_asyncio
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -205,7 +206,7 @@ from pydantic_ai import Agent
 # pydantic-ai.
 nest_asyncio.apply()
 
-# Load GROQ_API_KEY as an environment variable from the source file placed in root.
+# Load GROQ_API_KEY from a source file placed in root.
 load_dotenv()
 
 # Our desired structured output.
@@ -232,7 +233,7 @@ agent_lbc = Agent(
 )
 result_lbc = agent_lbc.run_sync(user_prompt=text_content_lbc)
 company_info = result_lbc.data.model_dump()
-company_info
+pprint(company_info)
 
 # %%
 # We see that all fields are extracted as desired! Let's also observe the messaging
@@ -240,25 +241,10 @@ company_info
 import json
 
 
-json.loads(result_lbc.all_messages_json())
+pprint(
+    json.loads(result_lbc.all_messages_json())
+)
 # %%
-# Interestingly, we see that the framework produced 3 messages (from top to bottom),
-# but looking at the Groq dev console, we notice that we actually made one single
-# API call to the LLM.
-# 
-# Here is Pydantic-AI workflow:
-#
-# 1. The first message is a request to the model, made of two parts: the system prompt
-#    and the user prompt, which here is the html text.
-#    Under the hood, 
-#    `pydantic-ai adds a structured output tool to the Groq client <https://github.com/pydantic/pydantic-ai/blob/16325844995f18977174638e9c4effc51036704e/pydantic_ai_slim/pydantic_ai/models/groq.py#L125-L132>`_
-# 2. Using this tool, Groq returned a json, which pydantic-ai parses as a Pydantic
-#    model.
-# 3. Finally, since the LLM indicated that it finished in step 2, pydantic-ai produces
-#    a closing message and returns the result.
-#
-# To quench our curiosity, here is the structured result tool passed to Groq:
-
 # Interestingly, we observe that the framework produced three messages (from top to
 # bottom), but when looking at the Groq dev console, we notice that only a single API
 # call was made to the LLM.
@@ -292,7 +278,7 @@ pprint(agent_lbc._result_schema.tool_defs())
 #
 # To illustrate the first step, here is an example of how the company list appears:
 #
-# .. image:: ../static/pappers_list.png
+# .. image:: ../_static/pappers_list.png
 #     
 # Notice that the company we are searching for – located in Perpignan – is the third
 # entry on the list!
@@ -312,6 +298,8 @@ def make_pappers_company_url(company_href):
 
 
 pappers_search_url = make_pappers_search_url(company_info["company_name"])
+print(pappers_search_url)
+
 soup = fetch_html_content(pappers_search_url, static_page=False, text_only=False)
 print_with_token_count(str(soup))
 
@@ -353,11 +341,13 @@ result_href.data
 # company's Pappers page.
 
 pappers_company_url = make_pappers_company_url(result_href.data.href)
+print(pappers_company_url)
+
 pappers_text_content = fetch_html_content(
     pappers_company_url, static_page=False, text_only=True
 )
 
-class CompanyInfo(BaseModel):
+class FinancialInfo(BaseModel):
     owner_name: str
     owner_age: str
     turnover: int
@@ -366,15 +356,15 @@ class CompanyInfo(BaseModel):
 agent_pappers_info = Agent(
     model_name,
     system_prompt=scraper_system_prompt,
-    result_type=CompanyInfo,
+    result_type=FinancialInfo,
 )
 
 user_prompt = f"html: <{pappers_text_content}>"
 pappers_info = agent_pappers_info.run_sync(user_prompt)
 financial_info = pappers_info.data.model_dump()
-financial_info
+pprint(financial_info)
 
 # %%
 # Finally, we store the output in a database and synchronize the lead with our CRM.
 company_info.update(financial_info)
-company_info
+pprint(company_info)

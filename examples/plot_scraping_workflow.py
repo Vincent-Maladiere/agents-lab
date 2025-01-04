@@ -162,7 +162,10 @@ def fetch_selenium(url, user_agent):
     options = webdriver.ChromeOptions()
     options.add_argument(f"--user-agent={user_agent}")
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Remote(
+        command_executor="http://localhost:4444/wd/hub",
+        options=options,
+    )
     driver.get(url)
 
     # Necessary to give the page time to load.

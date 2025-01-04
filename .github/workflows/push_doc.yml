@@ -15,6 +15,13 @@ permissions:
 jobs:
   push_doc:
     runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        ports:
+          - 4444:4444
+
     steps:
       - uses: actions/checkout@v3
 
@@ -30,6 +37,8 @@ jobs:
           echo GROQ_API_KEY='${{ secrets.GROQ_API_KEY }}' >> .env
 
       - name: Sphinx build
+        env:
+          SELENIUM_REMOTE_URL: http://localhost:4444/wd/hub
         run: sphinx-build doc build
 
       - name: Save the PR number

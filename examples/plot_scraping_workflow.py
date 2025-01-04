@@ -103,14 +103,13 @@ We define our HTML fetching functions below:
 
 # %%
 import time
-import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager, ChromeType
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+import chromedriver_autoinstaller
 
+
+chromedriver_autoinstaller.install() 
 
 # We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.
 @dataclass
@@ -159,7 +158,7 @@ def fetch_requests(url, user_agent):
 
 def fetch_selenium(url, user_agent):
     
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     options = [
         f"--user-agent={user_agent}",
         "--headless",
@@ -173,12 +172,7 @@ def fetch_selenium(url, user_agent):
     for option in options:
         chrome_options.add_argument(option)
 
-    chrome_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-    chrome_service = Service(chrome_path)
-
-    driver = webdriver.Chrome(
-        service=chrome_service, options=chrome_options
-    )
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
 
     # Necessary to give the page time to load.

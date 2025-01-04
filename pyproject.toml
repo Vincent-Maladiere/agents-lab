@@ -29,7 +29,7 @@ doc = [
     "pydantic-ai",
     "python-dotenv",
     "nest_asyncio",
-    "webdriver-manager",
+    "chromedriver-autoinstaller",
     "selenium",
     "requests",
     "beautifulsoup4",

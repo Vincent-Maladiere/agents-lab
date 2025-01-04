@@ -107,6 +107,16 @@ import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from selenium import webdriver
+import chromedriver_autoinstaller
+from pyvirtualdisplay import Display
+
+# Check if the current version of chromedriver exists and if it doesn't,
+# download it automatically and add chromedriver to the path.
+chromedriver_autoinstaller.install()
+
+
+display = Display(visible=0, size=(800, 800))  
+display.start()
 
 
 # We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.
@@ -159,13 +169,16 @@ def fetch_requests(url, user_agent):
 
 def fetch_selenium(url, user_agent):
     
-    options = webdriver.ChromeOptions()
-    options.add_argument(f"--user-agent={user_agent}")
+    chrome_options = webdriver.ChromeOptions()
+    options = [
+        f"--user-agent={user_agent}",
+        "--window-size=1200,1200",
+        "--ignore-certificate-errors",
+    ]
+    for option in options:
+        chrome_options.add_argument(option)
 
-    driver = webdriver.Remote(
-        command_executor="http://localhost:4444/wd/hub",
-        options=options,
-    )
+    driver = webdriver.Chrome(options=options)
     driver.get(url)
 
     # Necessary to give the page time to load.

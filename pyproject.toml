@@ -29,6 +29,8 @@ doc = [
     "pydantic-ai",
     "python-dotenv",
     "nest_asyncio",
+    "chromedriver-autoinstaller",
+    "pyvirtualdisplay",
     "selenium",
     "requests",
     "beautifulsoup4",

@@ -119,12 +119,9 @@ class Response:
     status_code: int = 200
 
 
-def get_lbc(url, headers=None):
+def request_get_lbc(url, headers=None):
     with open("../doc/_static/lbc_HTML_DOM.txt") as f:
         return Response(text=f.read())
-
-
-requests.get = get_lbc
 
 
 def fetch_html_content(url, static_page=True, text_only=False):
@@ -148,7 +145,7 @@ def fetch_html_content(url, static_page=True, text_only=False):
 
 def fetch_requests(url, user_agent):
     headers = {"User-Agent": user_agent}
-    response = requests.get(url, headers=headers)
+    response = request_get_lbc(url, headers=headers)
 
     # Check if the request was successful
     if response.status_code == 200:

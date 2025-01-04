@@ -1,0 +1,1120 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Web Scraping Workflow &#8212; agents-lab</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_scraping_workflow';</script>
+    <link rel="icon" href="../_static/agents_fav.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Examples" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+  <aside class="bd-header-announcement d-print-none d-none" aria-label="Announcement" data-pst-announcement-url="https://raw.githubusercontent.com/Vincent-Maladiere/agents-lab/main/doc/announcement.html"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/agents_fav.png" class="logo__image only-light" alt="agents-lab - Home"/>
+    <img src="../_static/agents_fav.png" class="logo__image only-dark pst-js-only" alt="agents-lab - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Vincent-Maladiere/agents-lab/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Examples
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Vincent-Maladiere/agents-lab/" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Web Scraping Workflow</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Web Scraping Workflow</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-plot-scraping-workflow-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="web-scraping-workflow">
+<span id="sphx-glr-auto-examples-plot-scraping-workflow-py"></span><h1>Web Scraping Workflow<a class="headerlink" href="#web-scraping-workflow" title="Link to this heading">#</a></h1>
+<p>In this notebook, we explore how <a class="reference external" href="https://ai.pydantic.dev/">Pydantic-AI</a> workflows
+can help us extract structured information from HTML pages. This example can be run
+entirely for free, and only requires signing up for
+<a class="reference external" href="https://groq.com/">Groq’s free tier</a>.</p>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">#</a></h2>
+<p>Scraping content from HTML pages has become ubiquitous, with use-cases ranging from
+growth marketing to dynamic pricing. A well-known challenge with web scraping is
+the polymorphic and ever-changing HTML structure of websites, making scraper automation
+difficult to maintain and scale. Developers often harcode the HTML paths of
+elements to be fetched, along with the logic for fetching them, resulting in brittle
+solutions.</p>
+<p>Research in LLMs offers promising avenues for performing web scraping more efficiently
+due to the following capabilities:</p>
+<ul class="simple">
+<li><p>longer context window, which can now contains large HTML DOMs
+(<a class="reference external" href="https://huggingface.co/blog/llama31#whats-new-with-llama-31">up to 128k tokens with llama 3</a>)</p></li>
+<li><p>structured output, adhering to predefined JSON schemas</p></li>
+<li><p>better reasoning to interpret raw text and extract higher-level information</p></li>
+<li><p>faster and cheaper inference, making LLM use economically viable</p></li>
+</ul>
+</section>
+<section id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Link to this heading">#</a></h2>
+<section id="workflows-vs-agents">
+<h3>Workflows vs agents<a class="headerlink" href="#workflows-vs-agents" title="Link to this heading">#</a></h3>
+<p>In most cases, web scraping does not require user-feedback, web search or tool
+invocation. Instead, it typically consists of sequential, acyclic steps.
+This makes simple workflows preferable for robustness and predictability
+compared to agent-based systems. For an in-depth discussion of the trade-offs between
+workflows and agents, refer to Anthropic’s blogpost on
+<a class="reference external" href="https://www.anthropic.com/research/building-effective-agents">Building effective agents</a>.</p>
+</section>
+<section id="html-doms-vs-screenshots">
+<h3>HTML DOMs vs Screenshots<a class="headerlink" href="#html-doms-vs-screenshots" title="Link to this heading">#</a></h3>
+<p>Recent work such as
+<a class="reference external" href="https://arxiv.org/abs/2401.13919">WebVoyager (He et al. 2024)</a>, has explored
+using screenshots to perform online actions (e.g. booking a flight) with agent-based
+system. For a practical implementation, see this
+<a class="reference external" href="https://langchain-ai.github.io/langgraph/tutorials/web-navigation/web_voyager">Langchain tutorial</a>.</p>
+<p>Currently, the main limitations of the screenshot-based approach include:</p>
+<ul class="simple">
+<li><p>Low average accuracy (~60%), due to the varying complexity of the websites and the
+number of steps required to perform the task.</p></li>
+<li><p>Limited choice of visual LLM. Since high definition screenshots are needed to read
+text, only GPT4-V and GPT4-o are adapted to perform these benchmarks.</p></li>
+<li><p>Limited use of textual information and HTML DOMs, screenshots rely heavily on visual
+data, while textual information and HTML DOMs remain LLMs’ primary mode of operation.</p></li>
+</ul>
+<p>Our use-case is simpler than WebVoyager, as it does not require performing actions or
+navigating accross multiple websites. Instead, we deal with a few web pages processed
+sequentially.</p>
+<p>Given this, our focus is on extracting HTML DOMs, while stripping away non-informative
+content such as styles or scripts. Beyond this automatic stripping, we avoid additional
+HTML transformation or lookups to keep the workflow as general and maintainable
+as possible.</p>
+</section>
+<section id="workflow">
+<h3>Workflow<a class="headerlink" href="#workflow" title="Link to this heading">#</a></h3>
+<p>Our use-case involves fetching information about car dealerships from a popular French
+e-commerce platform called “LeBonCoin” (LBC). To keep this notebook concise, we begin
+with a list of dealership URLs, which were previously obtained using another scraping
+system.</p>
+<p>The objective is to extract information from each dealerships’ LBC page and enrich it
+with financial data sourced from another website, “pappers.fr”.</p>
+<p>Our workflow is the following:</p>
+<pre  class="mermaid">
+        flowchart TD
+   A(Webdriver) --&gt;|Browse LBC company url| B(LBC Agent)
+   B --&gt; |Extract company info|C{Success}
+   C --&gt; |Yes|D[Webdriver]
+   C --&gt;|No| E[End]
+   D --&gt; |Browse Pappers listing using 'company name'|F[Pappers Agent]
+   F --&gt; |Find the company page from a list of companies, using name and city|G{Success}
+   G --&gt; |Yes|H[Pappers Agent]
+   G --&gt; |No|I[End]
+   H --&gt; |Extract company financial info|J[Finish]
+    </pre><p>Our webdriver uses a mix of <code class="docutils literal notranslate"><span class="pre">requests</span></code> for static pages (on LBC) and <code class="docutils literal notranslate"><span class="pre">selenium</span></code> where
+Javascript need to be enabled to access pages (on Pappers).</p>
+<p>We define our HTML fetching functions below:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">ChromeType</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+
+
+<span class="c1"># We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Response</span><span class="p">:</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span>
+
+
+<span class="k">def</span> <span class="nf">request_get_lbc</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../doc/_static/lbc_HTML_DOM.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">fetch_html_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+    <span class="c1"># Headers to mimic a browser request</span>
+    <span class="n">user_agent</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 &quot;</span>
+        <span class="s2">&quot;(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36&quot;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">static_page</span><span class="p">:</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
+
+    <span class="c1"># Strip all tags, and only return the text content of the page.</span>
+    <span class="k">if</span> <span class="n">text_only</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">separator</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">soup</span>
+
+
+<span class="k">def</span> <span class="nf">fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">user_agent</span><span class="p">}</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">request_get_lbc</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="c1"># Check if the request was successful</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="c1"># Parse the HTML content</span>
+        <span class="k">return</span> <span class="n">parse_html</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to fetch the URL. Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
+
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;--user-agent=</span><span class="si">{</span><span class="n">user_agent</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--headless&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--disable-gpu&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--window-size=1920,1200&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--ignore-certificate-errors&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--disable-extensions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--no-sandbox&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--disable-dev-shm-usage&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+    <span class="n">chrome_path</span> <span class="o">=</span> <span class="n">ChromeDriverManager</span><span class="p">(</span><span class="n">chrome_type</span><span class="o">=</span><span class="n">ChromeType</span><span class="o">.</span><span class="n">CHROMIUM</span><span class="p">)</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+    <span class="n">chrome_service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">chrome_path</span><span class="p">)</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
+        <span class="n">service</span><span class="o">=</span><span class="n">chrome_service</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span>
+    <span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="c1"># Necessary to give the page time to load.</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parse_html</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">parse_html</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Remove the following tags</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="p">([</span><span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="s2">&quot;svg&quot;</span><span class="p">,</span> <span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="s2">&quot;head&quot;</span><span class="p">]):</span>
+        <span class="n">tag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+
+    <span class="c1"># Remove the following attributes within tags</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">]:</span>
+            <span class="k">del</span> <span class="n">tag</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">soup</span>
+</pre></div>
+</div>
+<p>To keep this notebook concise and fast to execute, we will use only a single URL.
+Since the HTML structure is not required for this step, we will extract and retain
+only the text content from the dealership page.</p>
+<p>You can open the URL provided to review the outputs generated by the LLM,
+which will be produced in the next cell.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_with_token_count</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;character numbers: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+
+<span class="n">url_lbc</span> <span class="o">=</span> <span class="s2">&quot;https://www.leboncoin.fr/boutique/17050/garage_hamelin.htm&quot;</span>
+<span class="n">text_content_lbc</span> <span class="o">=</span> <span class="n">fetch_html_content</span><span class="p">(</span><span class="n">url_lbc</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">print_with_token_count</span><span class="p">(</span><span class="n">text_content_lbc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>character numbers: 3,673
+
+aller au contenu aller au pied de page Attention :  Activez JavaScript pour profiter de toutes les fonctionnalités de leboncoin GARAGE HAMELIN Suivre Infos Annonces  (27) Photos Contacter Suivre GARAGE HAMELIN Suivre GARAGE HAMELIN Infos Annonces  (27) Photos Contacter Suivre Une équipe dynamique à votre service ! Nos 2 agences Renault et Peugeot au Polygone Nord de Perpignan vous proposent:
+-ventes de véhicules neufs Renault et Dacia
+- un choix permanent de 60 véhicules occasion révisés et garantis
+- des véhicules de direction (faible kilo… Voir plus SIREN 409871969 Actif depuis le 26/01/2011 Visiter notre site internet Services de l’entreprise Reprise de véhicules Atelier d’entretien Contrat de maintenance Vente de véhicules Financement Extension de garantie Ventes de véhicules électriques Horaires Du lundi au vendredi
+08h00-12h00/ 14h00-18h30
+Samedi 09h00-12h00 /14h00-17h00
+contact : 04 68 52 63 33 Adresse 335 RUE ARISTIDE BERGES - ESPACE  POLYGONE NORD 66000 PERPIGNAN 27 annonces en ligne Choisir une localisation Filtres Tri :  Plus récentes Opel Crossland X 1.2 Turbo 110ch Edition BVA Euro 6d-T 12 490 € Voitures Perpignan 66000 hier à 17:15 Renault Clio 1.6 E-Tech hybride 140ch Limited -21N 15 990 € Voitures Perpignan 66000 hier à 16:55 Peugeot 3008 1.2 PureTech 130ch Crossway S&amp;S EAT6 14 990 € Voitures Perpignan 66000 hier à 16:45 Renault Zoe Zen charge rapide 6 990 € Voitures Perpignan 66000 hier à 14:05 Renault Captur 1.3 TCe mild hybrid 160ch Techno EDC 27 690 € Occasion récente Voitures Perpignan 66000 hier à 12:55 Peugeot 308 1.5 BlueHDi 130ch S&amp;S GT EAT8 29 490 € Voitures Perpignan 66000 hier à 10:35 Renault Clio 1.6 E-Tech 145ch full hybrid esprit Alpine - 24 24 990 € Voitures Perpignan 66000 hier à 05:15 Ford Transit Custom Fg 300 L2H1 2.0 EcoBlue 130 Trend Business 7cv 23 490 € Utilitaires Perpignan 66000 jeudi dernier à 18:25 Dacia Duster 1.3 TCe 150ch FAP PRESTIGE 4x2 EDC 20 490 € Voitures Perpignan 66000 jeudi dernier à 13:57 Peugeot 2008 1.5 BlueHDi 100ch E6.c GT Line S&amp;S BVM5 86g 14 490 € Voitures Perpignan 66000 jeudi dernier à 13:13 Afficher plus d’annonces Photos de l’entreprise Voir les photos L’équipe Contacter E-mail Téléphone Nom * E-mail * Téléphone Quel est l’objet de votre demande ? Un projet d’achat Un essai de véhicule Une reprise de véhicule Ajoutez un message (facultatif) Envoyer Me renseigner  sur les finalités du traitement de mes données personnelles, les destinataires, le responsable de traitement, les durées de conservation, les coordonnées du  DPO et mes droits. Pros Véhicules Pyrénées-Orientales GARAGE HAMELIN à propos du boncoin Qui sommes-nous ? Nous rejoindre Nos engagements L’Avenir a du bon Espace presse Nos applications Informations légales Conditions générales d’utilisation Référencement et classement des annonces Conditions générales de vente Vie privée / cookies Vos droits et obligations Avis utilisateurs Charte de bonne conduite Paiement en plusieurs fois Accessibilité Nos solutions pros Publicité Professionnels de l’immobilier Vos recrutements Professionnels de l’auto Professionnels du tourisme Autres solutions professionnelles Annuaire des professionnels Dépôt d‘offres d‘emploi : tarif réservé aux TPE Des questions ? Aide Le paiement sécurisé et la livraison Le porte-monnaie Le service de réservation de vacances en ligne pour les hôtes Votre dossier de location en ligne Votre espace bailleur Statut de nos services Vous êtes à l’étranger ? France leboncoin :  AVendreALouer leboncoin Immobilier Neuf L&#39;argus Agriaffaires MachineryZone Truckscorner Locasun Locasun-vp Younited Credit leboncoin 2006 - 2025 Retrouvez-nous sur version: release-2025-01-03.8701270
+</pre></div>
+</div>
+<p>Next, we pass the raw text content to a LLM. For this example, we choose the
+following:</p>
+<ul class="simple">
+<li><p>Groq: Used as our LLM endpoint, as it provides free access to the llama-3.3-70 model.</p></li>
+<li><p>Pydantic-AI: Selected as our LLM client/framework due to its streamlined approach
+to structuring responses, requiring less boilerplate compared to alternatives
+like LangChain.</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">nest_asyncio</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">pydantic_ai</span> <span class="kn">import</span> <span class="n">Agent</span>
+
+
+<span class="c1"># Enable nested event loop in a notebook, so that we can run asynchrone coroutines in</span>
+<span class="c1"># pydantic-ai.</span>
+<span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+
+<span class="c1"># Load GROQ_API_KEY from a source file placed in root.</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># Our desired structured output.</span>
+<span class="k">class</span> <span class="nc">CompanyInfoLBC</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">company_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">services_provided</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">number_of_cars</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">main_phone_number</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">country</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">city</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">full_address</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;groq:llama-3.3-70b-versatile&quot;</span>
+<span class="n">scraper_system_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">You are a scrapping assistant, and your goal is to extract company information</span>
+<span class="s2">from html text provided by the user.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">agent_lbc</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">,</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">scraper_system_prompt</span><span class="p">,</span>
+    <span class="n">result_type</span><span class="o">=</span><span class="n">CompanyInfoLBC</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">result_lbc</span> <span class="o">=</span> <span class="n">agent_lbc</span><span class="o">.</span><span class="n">run_sync</span><span class="p">(</span><span class="n">user_prompt</span><span class="o">=</span><span class="n">text_content_lbc</span><span class="p">)</span>
+<span class="n">company_info</span> <span class="o">=</span> <span class="n">result_lbc</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">company_info</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
+ &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
+ &#39;country&#39;: &#39;France&#39;,
+ &#39;description&#39;: &#39;Une équipe dynamique à votre service ! Nos 2 agences Renault &#39;
+                &#39;et Peugeot au Polygone Nord de Perpignan vous proposent: &#39;
+                &#39;-ventes de véhicules neufs Renault et Dacia - un choix &#39;
+                &#39;permanent de 60 véhicules occasion révisés et garantis&#39;,
+ &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE  POLYGONE NORD 66000 &#39;
+                 &#39;PERPIGNAN&#39;,
+ &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
+ &#39;number_of_cars&#39;: 60,
+ &#39;services_provided&#39;: &#39;Reprise de véhicules, Atelier d’entretien, Contrat de &#39;
+                      &#39;maintenance, Vente de véhicules, Financement, Extension &#39;
+                      &#39;de garantie, Ventes de véhicules électriques&#39;}
+</pre></div>
+</div>
+<p>We see that all fields are extracted as desired! Let’s also observe the messaging
+sequence of Pydantic-AI:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+
+<span class="n">pprint</span><span class="p">(</span>
+    <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result_lbc</span><span class="o">.</span><span class="n">all_messages_json</span><span class="p">())</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[{&#39;kind&#39;: &#39;request&#39;,
+  &#39;parts&#39;: [{&#39;content&#39;: &#39;\n&#39;
+                        &#39;You are a scrapping assistant, and your goal is to &#39;
+                        &#39;extract company information\n&#39;
+                        &#39;from html text provided by the user.\n&#39;,
+             &#39;part_kind&#39;: &#39;system-prompt&#39;},
+            {&#39;content&#39;: &#39;aller au contenu aller au pied de page Attention :  &#39;
+                        &#39;Activez JavaScript pour profiter de toutes les &#39;
+                        &#39;fonctionnalités de leboncoin GARAGE HAMELIN Suivre &#39;
+                        &#39;Infos Annonces  (27) Photos Contacter Suivre GARAGE &#39;
+                        &#39;HAMELIN Suivre GARAGE HAMELIN Infos Annonces  (27) &#39;
+                        &#39;Photos Contacter Suivre Une équipe dynamique à votre &#39;
+                        &#39;service ! Nos 2 agences Renault et Peugeot au &#39;
+                        &#39;Polygone Nord de Perpignan vous proposent:\n&#39;
+                        &#39;-ventes de véhicules neufs Renault et Dacia\n&#39;
+                        &#39;- un choix permanent de 60 véhicules occasion révisés &#39;
+                        &#39;et garantis\n&#39;
+                        &#39;- des véhicules de direction (faible kilo… Voir plus &#39;
+                        &#39;SIREN 409871969 Actif depuis le 26/01/2011 Visiter &#39;
+                        &#39;notre site internet Services de l’entreprise Reprise &#39;
+                        &#39;de véhicules Atelier d’entretien Contrat de &#39;
+                        &#39;maintenance Vente de véhicules Financement Extension &#39;
+                        &#39;de garantie Ventes de véhicules électriques Horaires &#39;
+                        &#39;Du lundi au vendredi\n&#39;
+                        &#39;08h00-12h00/ 14h00-18h30\n&#39;
+                        &#39;Samedi 09h00-12h00 /14h00-17h00\n&#39;
+                        &#39;contact : 04 68 52 63 33 Adresse 335 RUE ARISTIDE &#39;
+                        &#39;BERGES - ESPACE  POLYGONE NORD 66000 PERPIGNAN 27 &#39;
+                        &#39;annonces en ligne Choisir une localisation Filtres &#39;
+                        &#39;Tri :  Plus récentes Opel Crossland X 1.2 Turbo 110ch &#39;
+                        &#39;Edition BVA Euro 6d-T 12\u202f490\xa0€ Voitures &#39;
+                        &#39;Perpignan 66000 hier à 17:15 Renault Clio 1.6 E-Tech &#39;
+                        &#39;hybride 140ch Limited -21N 15\u202f990\xa0€ Voitures &#39;
+                        &#39;Perpignan 66000 hier à 16:55 Peugeot 3008 1.2 &#39;
+                        &#39;PureTech 130ch Crossway S&amp;S EAT6 14\u202f990\xa0€ &#39;
+                        &#39;Voitures Perpignan 66000 hier à 16:45 Renault Zoe Zen &#39;
+                        &#39;charge rapide 6\u202f990\xa0€ Voitures Perpignan &#39;
+                        &#39;66000 hier à 14:05 Renault Captur 1.3 TCe mild hybrid &#39;
+                        &#39;160ch Techno EDC 27\u202f690\xa0€ Occasion récente &#39;
+                        &#39;Voitures Perpignan 66000 hier à 12:55 Peugeot 308 1.5 &#39;
+                        &#39;BlueHDi 130ch S&amp;S GT EAT8 29\u202f490\xa0€ Voitures &#39;
+                        &#39;Perpignan 66000 hier à 10:35 Renault Clio 1.6 E-Tech &#39;
+                        &#39;145ch full hybrid esprit Alpine - 24 24\u202f990\xa0€ &#39;
+                        &#39;Voitures Perpignan 66000 hier à 05:15 Ford Transit &#39;
+                        &#39;Custom Fg 300 L2H1 2.0 EcoBlue 130 Trend Business 7cv &#39;
+                        &#39;23\u202f490\xa0€ Utilitaires Perpignan 66000 jeudi &#39;
+                        &#39;dernier à 18:25 Dacia Duster 1.3 TCe 150ch FAP &#39;
+                        &#39;PRESTIGE 4x2 EDC 20\u202f490\xa0€ Voitures Perpignan &#39;
+                        &#39;66000 jeudi dernier à 13:57 Peugeot 2008 1.5 BlueHDi &#39;
+                        &#39;100ch E6.c GT Line S&amp;S BVM5 86g 14\u202f490\xa0€ &#39;
+                        &#39;Voitures Perpignan 66000 jeudi dernier à 13:13 &#39;
+                        &#39;Afficher plus d’annonces Photos de l’entreprise Voir &#39;
+                        &#39;les photos L’équipe Contacter E-mail Téléphone Nom * &#39;
+                        &#39;E-mail * Téléphone Quel est l’objet de votre demande &#39;
+                        &#39;? Un projet d’achat Un essai de véhicule Une reprise &#39;
+                        &#39;de véhicule Ajoutez un message (facultatif) Envoyer &#39;
+                        &#39;Me renseigner  sur les finalités du traitement de mes &#39;
+                        &#39;données personnelles, les destinataires, le &#39;
+                        &#39;responsable de traitement, les durées de &#39;
+                        &#39;conservation, les coordonnées du  DPO et mes droits. &#39;
+                        &#39;Pros Véhicules Pyrénées-Orientales GARAGE HAMELIN à &#39;
+                        &#39;propos du boncoin Qui sommes-nous ? Nous rejoindre &#39;
+                        &#39;Nos engagements L’Avenir a du bon Espace presse Nos &#39;
+                        &#39;applications Informations légales Conditions &#39;
+                        &#39;générales d’utilisation Référencement et classement &#39;
+                        &#39;des annonces Conditions générales de vente Vie privée &#39;
+                        &#39;/ cookies Vos droits et obligations Avis utilisateurs &#39;
+                        &#39;Charte de bonne conduite Paiement en plusieurs fois &#39;
+                        &#39;Accessibilité Nos solutions pros Publicité &#39;
+                        &#39;Professionnels de l’immobilier Vos recrutements &#39;
+                        &#39;Professionnels de l’auto Professionnels du tourisme &#39;
+                        &#39;Autres solutions professionnelles Annuaire des &#39;
+                        &#39;professionnels Dépôt d‘offres d‘emploi : tarif &#39;
+                        &#39;réservé aux TPE Des questions ? Aide Le paiement &#39;
+                        &#39;sécurisé et la livraison Le porte-monnaie Le service &#39;
+                        &#39;de réservation de vacances en ligne pour les hôtes &#39;
+                        &#39;Votre dossier de location en ligne Votre espace &#39;
+                        &#39;bailleur Statut de nos services Vous êtes à &#39;
+                        &#39;l’étranger ? France leboncoin :  AVendreALouer &#39;
+                        &quot;leboncoin Immobilier Neuf L&#39;argus Agriaffaires &quot;
+                        &#39;MachineryZone Truckscorner Locasun Locasun-vp &#39;
+                        &#39;Younited Credit leboncoin 2006 - 2025 Retrouvez-nous &#39;
+                        &#39;sur version: release-2025-01-03.8701270&#39;,
+             &#39;part_kind&#39;: &#39;user-prompt&#39;,
+             &#39;timestamp&#39;: &#39;2025-01-04T01:05:06.315342Z&#39;}]},
+ {&#39;kind&#39;: &#39;response&#39;,
+  &#39;parts&#39;: [{&#39;args&#39;: {&#39;args_json&#39;: &#39;{&quot;city&quot;: &quot;Perpignan&quot;, &quot;company_name&quot;: &#39;
+                                   &#39;&quot;GARAGE HAMELIN&quot;, &quot;country&quot;: &quot;France&quot;, &#39;
+                                   &#39;&quot;description&quot;: &quot;Une \\u00e9quipe dynamique &#39;
+                                   &#39;\\u00e0 votre service ! Nos 2 agences &#39;
+                                   &#39;Renault et Peugeot au Polygone Nord de &#39;
+                                   &#39;Perpignan vous proposent: -ventes de &#39;
+                                   &#39;v\\u00e9hicules neufs Renault et Dacia - &#39;
+                                   &#39;un choix permanent de 60 v\\u00e9hicules &#39;
+                                   &#39;occasion r\\u00e9vis\\u00e9s et garantis&quot;, &#39;
+                                   &#39;&quot;full_address&quot;: &quot;335 RUE ARISTIDE BERGES - &#39;
+                                   &#39;ESPACE  POLYGONE NORD 66000 PERPIGNAN&quot;, &#39;
+                                   &#39;&quot;main_phone_number&quot;: &quot;04 68 52 63 33&quot;, &#39;
+                                   &#39;&quot;number_of_cars&quot;: 60, &quot;services_provided&quot;: &#39;
+                                   &#39;&quot;Reprise de v\\u00e9hicules, Atelier &#39;
+                                   &#39;d\\u2019entretien, Contrat de maintenance, &#39;
+                                   &#39;Vente de v\\u00e9hicules, Financement, &#39;
+                                   &#39;Extension de garantie, Ventes de &#39;
+                                   &#39;v\\u00e9hicules \\u00e9lectriques&quot;}&#39;},
+             &#39;part_kind&#39;: &#39;tool-call&#39;,
+             &#39;tool_call_id&#39;: &#39;call_3fka&#39;,
+             &#39;tool_name&#39;: &#39;final_result&#39;}],
+  &#39;timestamp&#39;: &#39;2025-01-04T01:05:06Z&#39;},
+ {&#39;kind&#39;: &#39;request&#39;,
+  &#39;parts&#39;: [{&#39;content&#39;: &#39;Final result processed.&#39;,
+             &#39;part_kind&#39;: &#39;tool-return&#39;,
+             &#39;timestamp&#39;: &#39;2025-01-04T01:05:08.386263Z&#39;,
+             &#39;tool_call_id&#39;: &#39;call_3fka&#39;,
+             &#39;tool_name&#39;: &#39;final_result&#39;}]}]
+</pre></div>
+</div>
+<p>Interestingly, we observe that the framework produced three messages (from top to
+bottom), but when looking at the Groq dev console, we notice that only a single API
+call was made to the LLM.</p>
+<p>Here is the Pydantic-AI workflow:</p>
+<ol class="arabic simple">
+<li><p>The first message is the request to the model, consisting of two parts: the system
+prompt and the user prompt, which in this case is the HTML text.
+Under the hood,
+<a class="reference external" href="https://github.com/pydantic/pydantic-ai/blob/16325844995f18977174638e9c4effc51036704e/pydantic_ai_slim/pydantic_ai/models/groq.py#L125-L132">pydantic-ai adds a structured output tool to the Groq client</a>.</p></li>
+<li><p>Using this tool, Groq returns a JSON object, which pydantic-ai parses into a
+Pydantic model.</p></li>
+<li><p>Finally, since the LLM indicates completion in step 2, pydantic-ai generates
+a closing message and returns the result.</p></li>
+</ol>
+<p>To quench our curiosity, here is the structured result tool passed to Groq:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+
+<span class="n">pprint</span><span class="p">(</span><span class="n">agent_lbc</span><span class="o">.</span><span class="n">_result_schema</span><span class="o">.</span><span class="n">tool_defs</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[ToolDefinition(name=&#39;final_result&#39;,
+                description=&#39;The final response which ends this conversation&#39;,
+                parameters_json_schema={&#39;properties&#39;: {&#39;city&#39;: {&#39;title&#39;: &#39;City&#39;,
+                                                                &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;company_name&#39;: {&#39;title&#39;: &#39;Company &#39;
+                                                                                 &#39;Name&#39;,
+                                                                        &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;country&#39;: {&#39;title&#39;: &#39;Country&#39;,
+                                                                   &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;description&#39;: {&#39;title&#39;: &#39;Description&#39;,
+                                                                       &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;full_address&#39;: {&#39;title&#39;: &#39;Full &#39;
+                                                                                 &#39;Address&#39;,
+                                                                        &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;main_phone_number&#39;: {&#39;title&#39;: &#39;Main &#39;
+                                                                                      &#39;Phone &#39;
+                                                                                      &#39;Number&#39;,
+                                                                             &#39;type&#39;: &#39;string&#39;},
+                                                       &#39;number_of_cars&#39;: {&#39;title&#39;: &#39;Number &#39;
+                                                                                   &#39;Of &#39;
+                                                                                   &#39;Cars&#39;,
+                                                                          &#39;type&#39;: &#39;integer&#39;},
+                                                       &#39;services_provided&#39;: {&#39;title&#39;: &#39;Services &#39;
+                                                                                      &#39;Provided&#39;,
+                                                                             &#39;type&#39;: &#39;string&#39;}},
+                                        &#39;required&#39;: [&#39;company_name&#39;,
+                                                     &#39;description&#39;,
+                                                     &#39;services_provided&#39;,
+                                                     &#39;number_of_cars&#39;,
+                                                     &#39;main_phone_number&#39;,
+                                                     &#39;country&#39;,
+                                                     &#39;city&#39;,
+                                                     &#39;full_address&#39;],
+                                        &#39;title&#39;: &#39;CompanyInfoLBC&#39;,
+                                        &#39;type&#39;: &#39;object&#39;},
+                outer_typed_dict_key=None)]
+</pre></div>
+</div>
+<p>The next step in our workflow is to enrich the information from LBC with financial
+data sourced from Pappers. This involves two LLM calls:</p>
+<ol class="arabic simple">
+<li><p>Generate a Pappers search URL using the company name and access the resulting page.
+This leads to a list of companies with similar names. We ask the LLM to identify
+the company that best matches our query, based on the provided name and city.</p></li>
+<li><p>Generate a Pappers company URL to access the company’s specific page, and then
+prompt the LLM to extract the desired financial information.</p></li>
+</ol>
+<p>To illustrate the first step, here is an example of how the company list appears:</p>
+<img alt="../_images/pappers_list.png" src="../_images/pappers_list.png" />
+<p>Notice that the company we are searching for – located in Perpignan – is the third
+entry on the list!</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+
+<span class="n">PAPPERS_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://www.pappers.fr/&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">make_pappers_search_url</span><span class="p">(</span><span class="n">company_name</span><span class="p">):</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">company_name</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">PAPPERS_BASE_URL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;recherche?q=</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">make_pappers_company_url</span><span class="p">(</span><span class="n">company_href</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">PAPPERS_BASE_URL</span><span class="p">,</span> <span class="n">company_href</span><span class="p">)</span>
+
+
+<span class="n">pappers_search_url</span> <span class="o">=</span> <span class="n">make_pappers_search_url</span><span class="p">(</span><span class="n">company_info</span><span class="p">[</span><span class="s2">&quot;company_name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pappers_search_url</span><span class="p">)</span>
+
+<span class="n">soup</span> <span class="o">=</span> <span class="n">fetch_html_content</span><span class="p">(</span><span class="n">pappers_search_url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">print_with_token_count</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/recherche?q=GARAGE+HAMELIN
+character numbers: 889
+
+&lt;html dir=&quot;ltr&quot; lang=&quot;en-US&quot;&gt;&lt;body&gt;&lt;div role=&quot;main&quot;&gt;&lt;div&gt;&lt;h1&gt;&lt;img alt=&quot;Icon for www.pappers.fr&quot; src=&quot;/favicon.ico&quot;/&gt;www.pappers.fr&lt;/h1&gt;&lt;p&gt;Verify you are human by completing the action below.&lt;/p&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;input type=&quot;hidden&quot;/&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;www.pappers.fr needs to review the security of your connection before proceeding.&lt;/div&gt;&lt;div&gt;&lt;div&gt;Verification successful&lt;/div&gt;&lt;div&gt;Waiting for www.pappers.fr to respond...&lt;/div&gt;&lt;/div&gt;&lt;noscript&gt;&lt;div&gt;&lt;span&gt;Enable JavaScript and cookies to continue&lt;/span&gt;&lt;/div&gt;&lt;/noscript&gt;&lt;/div&gt;&lt;/div&gt;&lt;div role=&quot;contentinfo&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;Ray ID: &lt;code&gt;8fc751c2d877d6f9&lt;/code&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Performance &amp;amp; security by &lt;a href=&quot;https://www.cloudflare.com?utm_source=challenge&amp;amp;utm_campaign=m&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;&gt;Cloudflare&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;
+</pre></div>
+</div>
+<p>We retain the HTML tags because they allow us to fetch the href corresponding
+to the company we are looking for. Keeping the HTML list structure helps the LLM
+distinguish between the different items more effectively.</p>
+<p>The downside is that the user prompt becomes quite large, exceeding 15,000 characters.
+This increases inference costs and requires using an LLM with a large context window.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CompanyHref</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">href</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="n">system_prompt_href</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    You are a web scraping assistant. Your task is to find the item in a HTML list</span>
+<span class="s2">    which matches best the query company information. Only returns the href matching</span>
+<span class="s2">    this item.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">agent_pappers_href</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">,</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt_href</span><span class="p">,</span>
+    <span class="n">result_type</span><span class="o">=</span><span class="n">CompanyHref</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">company_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;city&quot;</span><span class="p">,</span> <span class="s2">&quot;company_name&quot;</span><span class="p">]}</span>
+<span class="n">user_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    query: &lt;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&gt;</span>
+
+<span class="s2">    html: &lt;</span><span class="si">{</span><span class="n">soup</span><span class="si">}</span><span class="s2">&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">result_href</span> <span class="o">=</span> <span class="n">agent_pappers_href</span><span class="o">.</span><span class="n">run_sync</span><span class="p">(</span><span class="n">user_prompt</span><span class="p">)</span>
+<span class="n">result_href</span><span class="o">.</span><span class="n">data</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>CompanyHref(href=&#39;&#39;)
+</pre></div>
+</div>
+<p>This href corresponds to the Perpignan dealership we are searching for!
+Next, we complete the workflow by fetching financial information from the
+company’s Pappers page.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pappers_company_url</span> <span class="o">=</span> <span class="n">make_pappers_company_url</span><span class="p">(</span><span class="n">result_href</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">href</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pappers_company_url</span><span class="p">)</span>
+
+<span class="n">pappers_text_content</span> <span class="o">=</span> <span class="n">fetch_html_content</span><span class="p">(</span>
+    <span class="n">pappers_company_url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">FinancialInfo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">owner_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">owner_age</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">turnover</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">social_capital</span><span class="p">:</span> <span class="nb">int</span>
+
+<span class="n">agent_pappers_info</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="p">,</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">scraper_system_prompt</span><span class="p">,</span>
+    <span class="n">result_type</span><span class="o">=</span><span class="n">FinancialInfo</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">user_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;html: &lt;</span><span class="si">{</span><span class="n">pappers_text_content</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="n">pappers_info</span> <span class="o">=</span> <span class="n">agent_pappers_info</span><span class="o">.</span><span class="n">run_sync</span><span class="p">(</span><span class="n">user_prompt</span><span class="p">)</span>
+<span class="n">financial_info</span> <span class="o">=</span> <span class="n">pappers_info</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">financial_info</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/
+{&#39;owner_age&#39;: &#39;0&#39;,
+ &#39;owner_name&#39;: &#39;INSEE, INPI, BODACC&#39;,
+ &#39;social_capital&#39;: 0,
+ &#39;turnover&#39;: 0}
+</pre></div>
+</div>
+<p>Finally, we store the output in a database and synchronize the lead with our CRM.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">company_info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">financial_info</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">company_info</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
+ &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
+ &#39;country&#39;: &#39;France&#39;,
+ &#39;description&#39;: &#39;Une équipe dynamique à votre service ! Nos 2 agences Renault &#39;
+                &#39;et Peugeot au Polygone Nord de Perpignan vous proposent: &#39;
+                &#39;-ventes de véhicules neufs Renault et Dacia - un choix &#39;
+                &#39;permanent de 60 véhicules occasion révisés et garantis&#39;,
+ &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE  POLYGONE NORD 66000 &#39;
+                 &#39;PERPIGNAN&#39;,
+ &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
+ &#39;number_of_cars&#39;: 60,
+ &#39;owner_age&#39;: &#39;0&#39;,
+ &#39;owner_name&#39;: &#39;INSEE, INPI, BODACC&#39;,
+ &#39;services_provided&#39;: &#39;Reprise de véhicules, Atelier d’entretien, Contrat de &#39;
+                      &#39;maintenance, Vente de véhicules, Financement, Extension &#39;
+                      &#39;de garantie, Ventes de véhicules électriques&#39;,
+ &#39;social_capital&#39;: 0,
+ &#39;turnover&#39;: 0}
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.978 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-scraping-workflow-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b32420cf16f2ef3e676c979b1cf4b92f/plot_scraping_workflow.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_scraping_workflow.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/f7aaa2e1952df88cccc9cf7a789f4961/plot_scraping_workflow.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_scraping_workflow.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/016032702095361ad215e6d620c97034/plot_scraping_workflow.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_scraping_workflow.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#strategy">Strategy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflows-vs-agents">Workflows vs agents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#html-doms-vs-screenshots">HTML DOMs vs Screenshots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow">Workflow</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/auto_examples/plot_scraping_workflow.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+  <div class="sidebar-secondary-item">
+
+
+  <div class="sphx-glr-sidebar-component">
+    
+      
+        <div class="sphx-glr-sidebar-item sphx-glr-download-python-sidebar" title="plot_scraping_workflow.py">
+          <a download href="../_downloads/f7aaa2e1952df88cccc9cf7a789f4961/plot_scraping_workflow.py">
+            <i class="fa-solid fa-download"></i>
+            Download source code
+          </a>
+        </div>
+      
+    
+      
+        <div class="sphx-glr-sidebar-item sphx-glr-download-jupyter-sidebar" title="plot_scraping_workflow.ipynb">
+          <a download href="../_downloads/b32420cf16f2ef3e676c979b1cf4b92f/plot_scraping_workflow.ipynb">
+            <i class="fa-solid fa-download"></i>
+            Download Jupyter notebook
+          </a>
+        </div>
+      
+    
+      
+        <div class="sphx-glr-sidebar-item sphx-glr-download-zip-sidebar" title="plot_scraping_workflow.zip">
+          <a download href="../_downloads/016032702095361ad215e6d620c97034/plot_scraping_workflow.zip">
+            <i class="fa-solid fa-download"></i>
+            Download zipped
+          </a>
+        </div>
+      
+    
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Vincent Maladière.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

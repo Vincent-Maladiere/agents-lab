@@ -105,7 +105,23 @@ We define our HTML fetching functions below:
 import time
 import requests
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
 from selenium import webdriver
+
+
+# We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.
+@dataclass
+class Response:
+    text: str
+    status_code: int = 200
+
+
+def get_lbc(url, headers=None):
+    with open("../doc/_static/lbc_HTML_DOM.txt") as f:
+        return Response(text=f.read())
+
+
+requests.get = get_lbc
 
 
 def fetch_html_content(url, static_page=True, text_only=False):

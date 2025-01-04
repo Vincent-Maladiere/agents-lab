@@ -178,7 +178,7 @@ def fetch_selenium(url, user_agent):
     for option in options:
         chrome_options.add_argument(option)
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get(url)
 
     # Necessary to give the page time to load.
@@ -200,6 +200,7 @@ def parse_html(html):
             del tag[attribute]
 
     return soup
+
 
 # %%
 # To keep this notebook concise and fast to execute, we will use only a single URL.

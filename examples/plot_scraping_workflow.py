@@ -107,12 +107,9 @@ import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from selenium import webdriver
-import chromedriver_autoinstaller
-
-
-# Check if the current version of chromedriver exists and if it doesn't,
-# download it automatically and add chromedriver to the path.
-chromedriver_autoinstaller.install()
+from webdriver_manager.chrome import ChromeDriverManager, ChromeType
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 
 # We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.
@@ -165,14 +162,26 @@ def fetch_requests(url, user_agent):
 
 def fetch_selenium(url, user_agent):
     
-    chrome_options = webdriver.ChromeOptions()
+    chrome_options = Options()
     options = [
         f"--user-agent={user_agent}",
+        "--headless",
+        "--disable-gpu",
+        "--window-size=1920,1200",
+        "--ignore-certificate-errors",
+        "--disable-extensions",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
     ]
     for option in options:
         chrome_options.add_argument(option)
 
-    driver = webdriver.Chrome(options=chrome_options)
+    chrome_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    chrome_service = Service(chrome_path)
+
+    driver = webdriver.Chrome(
+        service=chrome_service, options=chrome_options
+    )
     driver.get(url)
 
     # Necessary to give the page time to load.

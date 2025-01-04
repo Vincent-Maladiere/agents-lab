@@ -443,14 +443,13 @@ with financial data sourced from another website, “pappers.fr”.</p>
 Javascript need to be enabled to access pages (on Pappers).</p>
 <p>We define our HTML fetching functions below:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
-<span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span><span class="p">,</span> <span class="n">ChromeType</span>
-<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
-<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+<span class="kn">import</span> <span class="nn">chromedriver_autoinstaller</span>
 
+
+<span class="n">chromedriver_autoinstaller</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 
 <span class="c1"># We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.</span>
 <span class="nd">@dataclass</span>
@@ -499,7 +498,7 @@ Javascript need to be enabled to access pages (on Pappers).</p>
 
 <span class="k">def</span> <span class="nf">fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
 
-    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">ChromeOptions</span><span class="p">()</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
         <span class="sa">f</span><span class="s2">&quot;--user-agent=</span><span class="si">{</span><span class="n">user_agent</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--headless&quot;</span><span class="p">,</span>
@@ -513,12 +512,7 @@ Javascript need to be enabled to access pages (on Pappers).</p>
     <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
         <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
 
-    <span class="n">chrome_path</span> <span class="o">=</span> <span class="n">ChromeDriverManager</span><span class="p">(</span><span class="n">chrome_type</span><span class="o">=</span><span class="n">ChromeType</span><span class="o">.</span><span class="n">CHROMIUM</span><span class="p">)</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
-    <span class="n">chrome_service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">chrome_path</span><span class="p">)</span>
-
-    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span>
-        <span class="n">service</span><span class="o">=</span><span class="n">chrome_service</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span>
-    <span class="p">)</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">)</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
     <span class="c1"># Necessary to give the page time to load.</span>
@@ -620,17 +614,14 @@ like LangChain.</p></li>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
  &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
  &#39;country&#39;: &#39;France&#39;,
- &#39;description&#39;: &#39;Une équipe dynamique à votre service ! Nos 2 agences Renault &#39;
-                &#39;et Peugeot au Polygone Nord de Perpignan vous proposent: &#39;
-                &#39;-ventes de véhicules neufs Renault et Dacia - un choix &#39;
-                &#39;permanent de 60 véhicules occasion révisés et garantis&#39;,
- &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE  POLYGONE NORD 66000 &#39;
+ &#39;description&#39;: &#39;Vente de vehicules neufs et occasions, entretien, reprise de &#39;
+                &#39;vehicules&#39;,
+ &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE POLYGONE NORD 66000 &#39;
                  &#39;PERPIGNAN&#39;,
  &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
  &#39;number_of_cars&#39;: 60,
- &#39;services_provided&#39;: &#39;Reprise de véhicules, Atelier d’entretien, Contrat de &#39;
-                      &#39;maintenance, Vente de véhicules, Financement, Extension &#39;
-                      &#39;de garantie, Ventes de véhicules électriques&#39;}
+ &#39;services_provided&#39;: &#39;Vente de vehicules, entretien, reprise de vehicules, &#39;
+                      &#39;financement, extension de garantie&#39;}
 </pre></div>
 </div>
 <p>We see that all fields are extracted as desired! Let’s also observe the messaging
@@ -727,35 +718,28 @@ sequence of Pydantic-AI:</p>
                         &#39;Younited Credit leboncoin 2006 - 2025 Retrouvez-nous &#39;
                         &#39;sur version: release-2025-01-03.8701270&#39;,
              &#39;part_kind&#39;: &#39;user-prompt&#39;,
-             &#39;timestamp&#39;: &#39;2025-01-04T01:05:06.315342Z&#39;}]},
+             &#39;timestamp&#39;: &#39;2025-01-04T01:17:26.638153Z&#39;}]},
  {&#39;kind&#39;: &#39;response&#39;,
-  &#39;parts&#39;: [{&#39;args&#39;: {&#39;args_json&#39;: &#39;{&quot;city&quot;: &quot;Perpignan&quot;, &quot;company_name&quot;: &#39;
-                                   &#39;&quot;GARAGE HAMELIN&quot;, &quot;country&quot;: &quot;France&quot;, &#39;
-                                   &#39;&quot;description&quot;: &quot;Une \\u00e9quipe dynamique &#39;
-                                   &#39;\\u00e0 votre service ! Nos 2 agences &#39;
-                                   &#39;Renault et Peugeot au Polygone Nord de &#39;
-                                   &#39;Perpignan vous proposent: -ventes de &#39;
-                                   &#39;v\\u00e9hicules neufs Renault et Dacia - &#39;
-                                   &#39;un choix permanent de 60 v\\u00e9hicules &#39;
-                                   &#39;occasion r\\u00e9vis\\u00e9s et garantis&quot;, &#39;
-                                   &#39;&quot;full_address&quot;: &quot;335 RUE ARISTIDE BERGES - &#39;
-                                   &#39;ESPACE  POLYGONE NORD 66000 PERPIGNAN&quot;, &#39;
+  &#39;parts&#39;: [{&#39;args&#39;: {&#39;args_json&#39;: &#39;{&quot;company_name&quot;: &quot;GARAGE HAMELIN&quot;, &#39;
+                                   &#39;&quot;description&quot;: &quot;Vente de vehicules neufs &#39;
+                                   &#39;et occasions, entretien, reprise de &#39;
+                                   &#39;vehicules&quot;, &quot;services_provided&quot;: &quot;Vente de &#39;
+                                   &#39;vehicules, entretien, reprise de &#39;
+                                   &#39;vehicules, financement, extension de &#39;
+                                   &#39;garantie&quot;, &quot;number_of_cars&quot;: 60, &#39;
                                    &#39;&quot;main_phone_number&quot;: &quot;04 68 52 63 33&quot;, &#39;
-                                   &#39;&quot;number_of_cars&quot;: 60, &quot;services_provided&quot;: &#39;
-                                   &#39;&quot;Reprise de v\\u00e9hicules, Atelier &#39;
-                                   &#39;d\\u2019entretien, Contrat de maintenance, &#39;
-                                   &#39;Vente de v\\u00e9hicules, Financement, &#39;
-                                   &#39;Extension de garantie, Ventes de &#39;
-                                   &#39;v\\u00e9hicules \\u00e9lectriques&quot;}&#39;},
+                                   &#39;&quot;country&quot;: &quot;France&quot;, &quot;city&quot;: &quot;Perpignan&quot;, &#39;
+                                   &#39;&quot;full_address&quot;: &quot;335 RUE ARISTIDE BERGES - &#39;
+                                   &#39;ESPACE POLYGONE NORD 66000 PERPIGNAN&quot;}&#39;},
              &#39;part_kind&#39;: &#39;tool-call&#39;,
-             &#39;tool_call_id&#39;: &#39;call_3fka&#39;,
+             &#39;tool_call_id&#39;: &#39;call_qsex&#39;,
              &#39;tool_name&#39;: &#39;final_result&#39;}],
-  &#39;timestamp&#39;: &#39;2025-01-04T01:05:06Z&#39;},
+  &#39;timestamp&#39;: &#39;2025-01-04T01:17:26Z&#39;},
  {&#39;kind&#39;: &#39;request&#39;,
   &#39;parts&#39;: [{&#39;content&#39;: &#39;Final result processed.&#39;,
              &#39;part_kind&#39;: &#39;tool-return&#39;,
-             &#39;timestamp&#39;: &#39;2025-01-04T01:05:08.386263Z&#39;,
-             &#39;tool_call_id&#39;: &#39;call_3fka&#39;,
+             &#39;timestamp&#39;: &#39;2025-01-04T01:17:27.858448Z&#39;,
+             &#39;tool_call_id&#39;: &#39;call_qsex&#39;,
              &#39;tool_name&#39;: &#39;final_result&#39;}]}]
 </pre></div>
 </div>
@@ -853,9 +837,38 @@ entry on the list!</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/recherche?q=GARAGE+HAMELIN
-character numbers: 889
+character numbers: 15,477
 
-&lt;html dir=&quot;ltr&quot; lang=&quot;en-US&quot;&gt;&lt;body&gt;&lt;div role=&quot;main&quot;&gt;&lt;div&gt;&lt;h1&gt;&lt;img alt=&quot;Icon for www.pappers.fr&quot; src=&quot;/favicon.ico&quot;/&gt;www.pappers.fr&lt;/h1&gt;&lt;p&gt;Verify you are human by completing the action below.&lt;/p&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;input type=&quot;hidden&quot;/&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;www.pappers.fr needs to review the security of your connection before proceeding.&lt;/div&gt;&lt;div&gt;&lt;div&gt;Verification successful&lt;/div&gt;&lt;div&gt;Waiting for www.pappers.fr to respond...&lt;/div&gt;&lt;/div&gt;&lt;noscript&gt;&lt;div&gt;&lt;span&gt;Enable JavaScript and cookies to continue&lt;/span&gt;&lt;/div&gt;&lt;/noscript&gt;&lt;/div&gt;&lt;/div&gt;&lt;div role=&quot;contentinfo&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;Ray ID: &lt;code&gt;8fc751c2d877d6f9&lt;/code&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;Performance &amp;amp; security by &lt;a href=&quot;https://www.cloudflare.com?utm_source=challenge&amp;amp;utm_campaign=m&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;&gt;Cloudflare&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;
+&lt;html lang=&quot;fr&quot;&gt;
+&lt;body&gt;
+&lt;!-- Google Tag Manager (noscript) --&gt;
+&lt;noscript&gt;&lt;iframe height=&quot;0&quot; src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-TQ4QRT9&quot; width=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/noscript&gt;
+&lt;!-- End Google Tag Manager (noscript) --&gt;
+&lt;div data-v-app=&quot;&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div data-v-2dbfa415=&quot;&quot;&gt;&lt;form action=&quot;/recherche&quot;&gt;&lt;div&gt;&lt;input autocapitalize=&quot;off&quot; autocomplete=&quot;off&quot; autocorrect=&quot;off&quot; placeholder=&quot;Entreprise, N° SIREN, Dirigeant, Mot-clé...&quot; spellcheck=&quot;false&quot; type=&quot;search&quot;/&gt;&lt;div&gt;&lt;div&gt;&lt;!--v-if--&gt;&lt;div&gt;&lt;button aria-disabled=&quot;false&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt; Rechercher des entreprises &lt;/span&gt;&lt;/button&gt;&lt;button aria-controls=&quot;el-id-3460-1&quot; aria-disabled=&quot;false&quot; aria-expanded=&quot;false&quot; aria-haspopup=&quot;menu&quot; aria-label=&quot;el.dropdown.toggleDropdown&quot; role=&quot;button&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div data-v-2d2f0904=&quot;&quot;&gt;&lt;a data-v-2d2f0904=&quot;&quot; href=&quot;#&quot;&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/form&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;p data-v-86957346=&quot;&quot;&gt;Filtrer par :&lt;/p&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;En activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Département&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Forme juridique&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Capital social&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Plus de filtres&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Résultats Trouvés&lt;/p&gt;&lt;p&gt;10 entreprises&lt;span&gt; correspondent à votre requête&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;#&quot;&gt;Exporter les résultats &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;GARAGE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SARL, société à responsabilité limitée&lt;/p&gt;&lt;p&gt;Depuis le 01/04/1989&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;JOUE-LES-TOURS&lt;/p&gt;&lt;p&gt;Code postal : 37300&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 1 et 2 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;7 622,45 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 17 publications sur 17&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;02/06/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Tours
+Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;
+Forme juridique : Société à responsabilité limitée
+Adresse&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-533619425&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-533619425&quot;&gt;GARAGE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SARL, société à responsabilité limitée&lt;/p&gt;&lt;p&gt;Depuis le 12/07/2011&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;SAINT-SAUVEUR-LE-VICOMTE&lt;/p&gt;&lt;p&gt;Code postal : 50390&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 1 et 2 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;5 000,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 14 publications sur 14&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;22/01/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Cherbourg
+Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;
+Forme juridique : Société à responsabilité limitée&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-ghd-409871969&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-ghd-409871969&quot;&gt;GARAGE HAMELIN G.H.D&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SASU, société par actions simplifiée unipersonnelle&lt;/p&gt;&lt;p&gt;Depuis le 01/12/1996&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;PERPIGNAN&lt;/p&gt;&lt;p&gt;Code postal : 66000&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 6 et 9 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;55 250,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;p&gt;Résultat net : &lt;span&gt;362 033 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 20 publications sur 20&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Modification&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;13/02/2020&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; Perpignan
+Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt; G.H.D.
+Forme juridique : Société par Actions Simplifiée
+Nom&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/hamelin-kevin-903568426&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/hamelin-kevin-903568426&quot;&gt;HAMELIN KEVIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;Entrepreneur individuel&lt;/p&gt;&lt;p&gt;Depuis le 20/09/2021&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;BEAUBEC-LA-ROSIERE&lt;/p&gt;&lt;p&gt;Code postal : 76440&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 1 publication sur 1&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Création&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;06/10/2021&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; principal
+Nom : Kévin, Pascal &lt;em&gt;HAMELIN&lt;/em&gt;
+Nom commercial : &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;
+Activité : entretien et&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-dominique-hamelin-801070590&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-dominique-hamelin-801070590&quot;&gt;GARAGE DOMINIQUE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SAS, société par actions simplifiée&lt;/p&gt;&lt;p&gt;Depuis le 03/02/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;ROUVIGNIES&lt;/p&gt;&lt;p&gt;Code postal : 59220&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;1 000,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;p&gt;Résultat net : &lt;span&gt;-7 918 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 11 publications sur 11&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Modification&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;01/03/2024&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; Valenciennes
+Dénomination : &lt;em&gt;garage&lt;/em&gt; Dominique &lt;em&gt;Hamelin&lt;/em&gt;
+Forme juridique : Société par actions simplifiée&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/sandd-hamelin-452487200&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/sandd-hamelin-452487200&quot;&gt;S&amp;amp;D HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SASU, société par actions simplifiée unipersonnelle&lt;/p&gt;&lt;p&gt;Depuis le 01/03/2004&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Activités des sociétés holding&lt;/p&gt;&lt;p&gt;Code NAF : 64.20Z&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;PERPIGNAN&lt;/p&gt;&lt;p&gt;Code postal : 66000&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;15 000,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;p&gt;Résultat net : &lt;span&gt;53 381 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 7 publications sur 17&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;14/03/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Perpignan
+Dénomination : SOCIETE D&#39;EXPLOITATION &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;
+Forme juridique : Société à&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/sci-du-polygone-433091873&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/sci-du-polygone-433091873&quot;&gt;SCI DU POLYGONE&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SCI, société civile immobilière&lt;/p&gt;&lt;p&gt;&lt;span&gt;Cessée&lt;/span&gt;&lt;span&gt; le 30/09/2017&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Location de terrains et d&#39;autres biens immobiliers&lt;/p&gt;&lt;p&gt;Code NAF : 68.20B&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;PERPIGNAN&lt;/p&gt;&lt;p&gt;Code postal : 66000&lt;/p&gt;&lt;p&gt;+ 1 autre ville&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;930,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;1 Dirigeant du même nom trouvé (sur 2)&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Dirigeant&lt;/p&gt;&lt;a href=&quot;/recherche-dirigeants?siren=409871969&quot;&gt;&lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt; G.H.D.&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Qualité&lt;/p&gt;&lt;p&gt;Autre &lt;!-- --&gt;&lt;/p&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div&gt;&lt;p&gt;Forme juridique&lt;/p&gt;&lt;p&gt;Société à responsabilité limitée ans&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/polygone-du-nord-791017528&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/polygone-du-nord-791017528&quot;&gt;POLYGONE DU NORD&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SCI, société civile immobilière&lt;/p&gt;&lt;p&gt;Depuis le 01/01/2013&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Location de terrains et d&#39;autres biens immobiliers&lt;/p&gt;&lt;p&gt;Code NAF : 68.20B&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;PERPIGNAN&lt;/p&gt;&lt;p&gt;Code postal : 66000&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;2 500,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;1 Dirigeant du même nom trouvé (sur 2)&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Dirigeant&lt;/p&gt;&lt;a href=&quot;/recherche-dirigeants?siren=452487200&quot;&gt;SOCIETE D&#39;EXPLOITATION &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Qualité&lt;/p&gt;&lt;p&gt;Associé indéfiniment responsable &lt;!-- --&gt;&lt;/p&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div&gt;&lt;p&gt;Forme juridique&lt;/p&gt;&lt;p&gt;Société à responsabilité limitée (sans autre indication) ans&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/hamelin-thierry-410967525&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/hamelin-thierry-410967525&quot;&gt;HAMELIN THIERRY&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;Entrepreneur individuel&lt;/p&gt;&lt;p&gt;&lt;span&gt;Cessé&lt;/span&gt;&lt;span&gt; le 02/07/2003&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Commerce de véhicules automobiles&lt;/p&gt;&lt;p&gt;Code NAF : 50.1Z&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;SAINT-GOBAIN&lt;/p&gt;&lt;p&gt;Code postal : 02410&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;0 salarié&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 1 publication sur 2&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Radiation&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;23/06/2011&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt;-Quentin
+Nom : Thierry, Paul, Julien &lt;em&gt;HAMELIN&lt;/em&gt;
+Activité : &lt;em&gt;garage&lt;/em&gt; tôlerie réparations vente de véhicules&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-des-ronchettes-342662350&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-des-ronchettes-342662350&quot;&gt;GARAGE DES RONCHETTES&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SAS, société par actions simplifiée&lt;/p&gt;&lt;p&gt;Depuis le 02/10/1987&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Commerce de voitures et de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.11Z&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;SAINT-LO&lt;/p&gt;&lt;p&gt;Code postal : 50000&lt;/p&gt;&lt;p&gt;+ 1 autre ville&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 20 et 49 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;462 000,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;p&gt;Résultat net : &lt;span&gt;-287 496 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 1 publication sur 20&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Modification&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;04/12/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;span&gt;s&lt;/span&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; Coutances
+Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; DES RONCHETTES
+Forme juridique : Société par actions simplifiée&lt;/div&gt;&lt;/span&gt;&lt;span&gt;&lt;div&gt;
+Administration : Président : &lt;em&gt;HAMELIN&lt;/em&gt; Christophe, Jean-Yves, Sébastien Dirigeant en France d&#39;une personne&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a&gt;Exporter les résultats &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;footer&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;a href=&quot;/&quot;&gt;&lt;img alt=&quot;Logo Pappers Entreprises&quot; src=&quot;https://www.pappers.fr/img/logo-pappers-entreprises-white.svg&quot;/&gt;&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;a aria-label=&quot;LinkedIn&quot; href=&quot;https://www.linkedin.com/company/pappers/&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;a aria-label=&quot;Partager sur Facebook&quot; href=&quot;http://www.facebook.com/sharer.php?u=https://www.pappers.fr/&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;a aria-label=&quot;Twitter&quot; href=&quot;https://twitter.com/get_pappers&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Ressources &lt;p&gt;&lt;a href=&quot;/presse&quot;&gt;Presse&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/classements&quot;&gt;Classements &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;/classements/entreprises-chiffre-affaires&quot;&gt;des entreprises par chiffre d&#39;affaires&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;/classements/entreprises-rentables&quot;&gt;des entreprises par résultat net&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;/tendances/classement/semaine&quot;&gt;des entreprises par popularité&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;/annuaire&quot;&gt;Annuaire&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/guide&quot;&gt;Blog&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Informations légales &lt;p&gt;&lt;a href=&quot;/politique-de-protection-des-donnees-personnelles&quot;&gt;Données personnelles&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/mentions-legales&quot;&gt;Mentions légales&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Nous connaître &lt;p&gt;&lt;a href=&quot;/a-propos&quot;&gt;A propos&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/faq&quot;&gt;FAQ&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/contact&quot;&gt;Contact&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;p&gt;Nos données sont constamment actualisées, entièrement gratuites et proviennent de l&#39;INSEE, l&#39;INPI et du BODACC.&lt;/p&gt;&lt;div&gt;&lt;p&gt;Inscrivez-vous à la newsletter mensuelle :&lt;/p&gt;&lt;fieldset&gt;&lt;input autocomplete=&quot;email&quot; placeholder=&quot;E-mail&quot; required=&quot;&quot; type=&quot;email&quot;/&gt;&lt;button disabled=&quot;&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/fieldset&gt;&lt;fieldset&gt;&lt;input type=&quot;checkbox&quot;/&gt;&lt;label for=&quot;cgu-newsletter&quot;&gt; En vous inscrivant, vous acceptez la &lt;a href=&quot;/politique-de-protection-des-donnees-personnelles&quot; target=&quot;_blank&quot;&gt;&lt;u&gt;Politique générale de Protection des Données&lt;/u&gt;&lt;/a&gt;. &lt;/label&gt;&lt;/fieldset&gt;&lt;/div&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;/footer&gt;&lt;/div&gt;
+
+&lt;div&gt;&lt;div aria-hidden=&quot;true&quot; data-popper-escaped=&quot;false&quot; data-popper-placement=&quot;bottom&quot; data-popper-reference-hidden=&quot;false&quot; tabindex=&quot;-1&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;ul aria-labelledby=&quot;el-id-3460-0&quot; role=&quot;menu&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des entreprises&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des dirigeants&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;true&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;Rechercher des bénéficiaires effectifs&lt;/span&gt;&lt;div data-v-3f44af78=&quot;&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des documents&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des publications&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des marques&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span data-popper-arrow=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;!--v-if--&gt;&lt;/div&gt;
+&lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://use.fontawesome.com/releases/v5.8.1/css/all.css&quot; integrity=&quot;sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf&quot; rel=&quot;stylesheet&quot;/&gt;
+&lt;/body&gt;&lt;/html&gt;
 </pre></div>
 </div>
 <p>We retain the HTML tags because they allow us to fetch the href corresponding
@@ -888,7 +901,7 @@ This increases inference costs and requires using an LLM with a large context wi
 <span class="n">result_href</span><span class="o">.</span><span class="n">data</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>CompanyHref(href=&#39;&#39;)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>CompanyHref(href=&#39;/entreprise/garage-hamelin-ghd-409871969&#39;)
 </pre></div>
 </div>
 <p>This href corresponds to the Perpignan dealership we are searching for!
@@ -919,11 +932,11 @@ company’s Pappers page.</p>
 <span class="n">pprint</span><span class="p">(</span><span class="n">financial_info</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/
-{&#39;owner_age&#39;: &#39;0&#39;,
- &#39;owner_name&#39;: &#39;INSEE, INPI, BODACC&#39;,
- &#39;social_capital&#39;: 0,
- &#39;turnover&#39;: 0}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/entreprise/garage-hamelin-ghd-409871969
+{&#39;owner_age&#39;: &#39;None&#39;,
+ &#39;owner_name&#39;: &#39;LUCA HOLDING&#39;,
+ &#39;social_capital&#39;: 55250,
+ &#39;turnover&#39;: 362000}
 </pre></div>
 </div>
 <p>Finally, we store the output in a database and synchronize the lead with our CRM.</p>
@@ -934,24 +947,21 @@ company’s Pappers page.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
  &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
  &#39;country&#39;: &#39;France&#39;,
- &#39;description&#39;: &#39;Une équipe dynamique à votre service ! Nos 2 agences Renault &#39;
-                &#39;et Peugeot au Polygone Nord de Perpignan vous proposent: &#39;
-                &#39;-ventes de véhicules neufs Renault et Dacia - un choix &#39;
-                &#39;permanent de 60 véhicules occasion révisés et garantis&#39;,
- &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE  POLYGONE NORD 66000 &#39;
+ &#39;description&#39;: &#39;Vente de vehicules neufs et occasions, entretien, reprise de &#39;
+                &#39;vehicules&#39;,
+ &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE POLYGONE NORD 66000 &#39;
                  &#39;PERPIGNAN&#39;,
  &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
  &#39;number_of_cars&#39;: 60,
- &#39;owner_age&#39;: &#39;0&#39;,
- &#39;owner_name&#39;: &#39;INSEE, INPI, BODACC&#39;,
- &#39;services_provided&#39;: &#39;Reprise de véhicules, Atelier d’entretien, Contrat de &#39;
-                      &#39;maintenance, Vente de véhicules, Financement, Extension &#39;
-                      &#39;de garantie, Ventes de véhicules électriques&#39;,
- &#39;social_capital&#39;: 0,
- &#39;turnover&#39;: 0}
+ &#39;owner_age&#39;: &#39;None&#39;,
+ &#39;owner_name&#39;: &#39;LUCA HOLDING&#39;,
+ &#39;services_provided&#39;: &#39;Vente de vehicules, entretien, reprise de vehicules, &#39;
+                      &#39;financement, extension de garantie&#39;,
+ &#39;social_capital&#39;: 55250,
+ &#39;turnover&#39;: 362000}
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 20.978 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 0.594 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-scraping-workflow-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b32420cf16f2ef3e676c979b1cf4b92f/plot_scraping_workflow.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_scraping_workflow.ipynb</span></code></a></p>

@@ -378,4 +378,4 @@ pprint(
 from pathlib import Path
 
 
-Path("tmp").unlink()
+Path("tmp").rmdir()

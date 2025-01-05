@@ -375,7 +375,7 @@ pprint(
 )
 # %%
 # Finally, we cleanup the ``tmp`` diskcache folder.
-from pathlib import Path
+import shutil
 
 
-Path("tmp").rmdir()
+shutil.rmtree('tmp')

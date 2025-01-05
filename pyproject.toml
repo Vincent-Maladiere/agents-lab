@@ -33,4 +33,11 @@ doc = [
     "selenium",
     "requests",
     "beautifulsoup4",
+    "diskcache",
+    "skrub[transformers]",
+    "logfire",
+]
+
+dev = [
+    "jupyterlab"
 ]

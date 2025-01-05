@@ -102,6 +102,12 @@ We define our HTML fetching functions below:
 """
 
 # %%
+# Implementation
+# --------------
+#
+# LBC
+# ~~~
+#
 import time
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
@@ -119,21 +125,44 @@ class Response:
 
 
 def request_get_lbc(url, headers=None):
+    """
+    Monkey-patch: return a static text file instead of making HTTP call.
+    """
     with open("../doc/_static/lbc_HTML_DOM.txt") as f:
         return Response(text=f.read())
 
 
 def fetch_html_content(url, static_page=True, text_only=False):
+    """Get the HTML DOM content of a URL.
 
+    Parameters
+    ----------
+    url : str
+        The url to be accessed
+    
+    static_page : bool, default=True
+        The strategy to fetch the content of a page.
+        - If True, the target page is considered static, and `requests.get` is used.
+        - If False, the target page requires Javascript and `selenium` is used
+          instead.
+    
+    text_only : bool, default=False
+        Whether or not to remove all HTML tags from the content.
+
+    Returns
+    -------
+    soup : BeautifulSoup
+        The content of the page parsed with bs4.
+    """
     # Headers to mimic a browser request
     user_agent = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     )
     if static_page:
-        soup = fetch_requests(url, user_agent)
+        soup = _fetch_requests(url, user_agent)
     else:
-        soup = fetch_selenium(url, user_agent)
+        soup = _fetch_selenium(url, user_agent)
     
     # Strip all tags, and only return the text content of the page.
     if text_only:
@@ -142,22 +171,21 @@ def fetch_html_content(url, static_page=True, text_only=False):
     return soup
 
 
-def fetch_requests(url, user_agent):
+def _fetch_requests(url, user_agent):
     headers = {"User-Agent": user_agent}
     response = request_get_lbc(url, headers=headers)
 
     # Check if the request was successful
     if response.status_code == 200:
         # Parse the HTML content
-        return parse_html(response.text)    
+        return _parse_html(response.text)    
     else:
         raise ValueError(
             f"Failed to fetch the URL. Status code: {response.status_code}"
         )
        
 
-def fetch_selenium(url, user_agent):
-    
+def _fetch_selenium(url, user_agent):
     chrome_options = webdriver.ChromeOptions()
     options = [
         f"--user-agent={user_agent}",
@@ -178,10 +206,10 @@ def fetch_selenium(url, user_agent):
     # Necessary to give the page time to load.
     time.sleep(3)
     
-    return parse_html(driver.page_source)
+    return _parse_html(driver.page_source)
 
 
-def parse_html(html):
+def _parse_html(html):
     soup = BeautifulSoup(html, "html.parser")
 
     # Remove the following tags
@@ -205,7 +233,7 @@ def parse_html(html):
 # which will be produced in the next cell.
 
 def print_with_token_count(text):
-    print(f"character numbers: {len(text):,}\n")
+    print(f"character count: {len(text):,}\n")
     print(text)
 
 
@@ -294,6 +322,9 @@ from pprint import pprint
 
 pprint(agent_lbc._result_schema.tool_defs())
 # %%
+# Pappers
+# ~~~~~~~
+#
 # The next step in our workflow is to enrich the information from LBC with financial
 # data sourced from Pappers. This involves two LLM calls:
 #

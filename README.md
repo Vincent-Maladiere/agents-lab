@@ -3,7 +3,7 @@
 ![header](doc/_static/agents_crew.png)
 
 Agents-lab is an exploratory project and a collection of examples, showcasing minimal
-yet efficient implementation of workflows and agentic systems.
+yet efficient implementations of workflows and agentic systems.
 
 All examples are self-contained in a single notebook, and don't require setting-up
 additional services beyond getting an API key from LLM providers.

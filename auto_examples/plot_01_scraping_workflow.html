@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
@@ -59,10 +59,11 @@
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
 window.addEventListener("load", () => mermaid.run());
 </script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_scraping_workflow';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/plot_01_scraping_workflow';</script>
     <link rel="icon" href="../_static/agents_fav.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RAG Agent" href="plot_02_rag_agent.html" />
     <link rel="prev" title="Examples" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -295,6 +296,7 @@ window.addEventListener("load", () => mermaid.run());
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Web Scraping Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot_02_rag_agent.html">RAG Agent</a></li>
 </ul>
 </div>
 </nav></div>
@@ -357,11 +359,11 @@ window.addEventListener("load", () => mermaid.run());
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#sphx-glr-download-auto-examples-plot-scraping-workflow-py"><span class="std std-ref">Go to the end</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-plot-01-scraping-workflow-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="web-scraping-workflow">
-<span id="sphx-glr-auto-examples-plot-scraping-workflow-py"></span><h1>Web Scraping Workflow<a class="headerlink" href="#web-scraping-workflow" title="Link to this heading">#</a></h1>
+<span id="sphx-glr-auto-examples-plot-01-scraping-workflow-py"></span><h1>Web Scraping Workflow<a class="headerlink" href="#web-scraping-workflow" title="Link to this heading">#</a></h1>
 <p>In this notebook, we explore how <a class="reference external" href="https://ai.pydantic.dev/">Pydantic-AI</a> workflows
 can help us extract structured information from HTML pages. This example can be run
 entirely for free, and only requires signing up for
@@ -442,38 +444,67 @@ with financial data sourced from another website, “pappers.fr”.</p>
     </pre><p>Our webdriver uses a mix of <code class="docutils literal notranslate"><span class="pre">requests</span></code> for static pages (on LBC) and <code class="docutils literal notranslate"><span class="pre">selenium</span></code> where
 Javascript need to be enabled to access pages (on Pappers).</p>
 <p>We define our HTML fetching functions below:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
-<span class="kn">import</span> <span class="nn">chromedriver_autoinstaller</span>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<section id="lbc">
+<h3>LBC<a class="headerlink" href="#lbc" title="Link to this heading">#</a></h3>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">selenium</span><span class="w"> </span><span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">chromedriver_autoinstaller</span>
 
 
 <span class="n">chromedriver_autoinstaller</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 
 <span class="c1"># We monkey-patch `requests.get` because GitHub CI triggers LBC bot detection.</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Response</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Response</span><span class="p">:</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span>
 
 
-<span class="k">def</span> <span class="nf">request_get_lbc</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_get_lbc</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Monkey-patch: return a static text file instead of making HTTP call.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;../doc/_static/lbc_HTML_DOM.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 
 
-<span class="k">def</span> <span class="nf">fetch_html_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_html_content</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the HTML DOM content of a URL.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url : str</span>
+<span class="sd">        The url to be accessed</span>
+
+<span class="sd">    static_page : bool, default=True</span>
+<span class="sd">        The strategy to fetch the content of a page.</span>
+<span class="sd">        - If True, the target page is considered static, and `requests.get` is used.</span>
+<span class="sd">        - If False, the target page requires Javascript and `selenium` is used</span>
+<span class="sd">          instead.</span>
+
+<span class="sd">    text_only : bool, default=False</span>
+<span class="sd">        Whether or not to remove all HTML tags from the content.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    soup : BeautifulSoup</span>
+<span class="sd">        The content of the page parsed with bs4.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Headers to mimic a browser request</span>
     <span class="n">user_agent</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 &quot;</span>
         <span class="s2">&quot;(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36&quot;</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">static_page</span><span class="p">:</span>
-        <span class="n">soup</span> <span class="o">=</span> <span class="n">fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">_fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">soup</span> <span class="o">=</span> <span class="n">fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">_fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
 
     <span class="c1"># Strip all tags, and only return the text content of the page.</span>
     <span class="k">if</span> <span class="n">text_only</span><span class="p">:</span>
@@ -482,22 +513,21 @@ Javascript need to be enabled to access pages (on Pappers).</p>
     <span class="k">return</span> <span class="n">soup</span>
 
 
-<span class="k">def</span> <span class="nf">fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_requests</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">user_agent</span><span class="p">}</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">request_get_lbc</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
 
     <span class="c1"># Check if the request was successful</span>
     <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
         <span class="c1"># Parse the HTML content</span>
-        <span class="k">return</span> <span class="n">parse_html</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_parse_html</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Failed to fetch the URL. Status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_selenium</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">):</span>
     <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">ChromeOptions</span><span class="p">()</span>
     <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
         <span class="sa">f</span><span class="s2">&quot;--user-agent=</span><span class="si">{</span><span class="n">user_agent</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -518,10 +548,10 @@ Javascript need to be enabled to access pages (on Pappers).</p>
     <span class="c1"># Necessary to give the page time to load.</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">parse_html</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_parse_html</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">parse_html</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_html</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
     <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
 
     <span class="c1"># Remove the following tags</span>
@@ -541,8 +571,8 @@ Since the HTML structure is not required for this step, we will extract and reta
 only the text content from the dealership page.</p>
 <p>You can open the URL provided to review the outputs generated by the LLM,
 which will be produced in the next cell.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">print_with_token_count</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;character numbers: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_with_token_count</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;character count: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 
 
@@ -551,7 +581,7 @@ which will be produced in the next cell.</p>
 <span class="n">print_with_token_count</span><span class="p">(</span><span class="n">text_content_lbc</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>character numbers: 3,673
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>character count: 3,673
 
 aller au contenu aller au pied de page Attention :  Activez JavaScript pour profiter de toutes les fonctionnalités de leboncoin GARAGE HAMELIN Suivre Infos Annonces  (27) Photos Contacter Suivre GARAGE HAMELIN Suivre GARAGE HAMELIN Infos Annonces  (27) Photos Contacter Suivre Une équipe dynamique à votre service ! Nos 2 agences Renault et Peugeot au Polygone Nord de Perpignan vous proposent:
 -ventes de véhicules neufs Renault et Dacia
@@ -570,11 +600,11 @@ following:</p>
 to structuring responses, requiring less boilerplate compared to alternatives
 like LangChain.</p></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
-<span class="kn">import</span> <span class="nn">nest_asyncio</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
-<span class="kn">from</span> <span class="nn">pydantic_ai</span> <span class="kn">import</span> <span class="n">Agent</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_ai</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
 
 
 <span class="c1"># Enable nested event loop in a notebook, so that we can run asynchrone coroutines in</span>
@@ -585,7 +615,7 @@ like LangChain.</p></li>
 <span class="n">load_dotenv</span><span class="p">()</span>
 
 <span class="c1"># Our desired structured output.</span>
-<span class="k">class</span> <span class="nc">CompanyInfoLBC</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompanyInfoLBC</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">company_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">services_provided</span><span class="p">:</span> <span class="nb">str</span>
@@ -611,22 +641,26 @@ like LangChain.</p></li>
 <span class="n">pprint</span><span class="p">(</span><span class="n">company_info</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/agents-lab/agents-lab/examples/plot_01_scraping_workflow.py:289: LogfireNotConfiguredWarning: No logs or spans will be created until `logfire.configure()` has been called. Set the environment variable LOGFIRE_IGNORE_NO_CONFIG=1 or add ignore_no_config=true in pyproject.toml to suppress this warning.
+  result_lbc = agent_lbc.run_sync(user_prompt=text_content_lbc)
+{&#39;city&#39;: &#39;Perpignan&#39;,
  &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
  &#39;country&#39;: &#39;France&#39;,
- &#39;description&#39;: &#39;Vente de vehicules neufs et occasions, entretien, reprise de &#39;
-                &#39;vehicules&#39;,
+ &#39;description&#39;: &#39;Vente de vehicules neufs Renault et Dacia, vehicules &#39;
+                &quot;occasions, reprise de vehicules, atelier d&#39;entretien, contrat &quot;
+                &#39;de maintenance, vente de vehicules electriques&#39;,
  &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE POLYGONE NORD 66000 &#39;
                  &#39;PERPIGNAN&#39;,
  &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
  &#39;number_of_cars&#39;: 60,
- &#39;services_provided&#39;: &#39;Vente de vehicules, entretien, reprise de vehicules, &#39;
-                      &#39;financement, extension de garantie&#39;}
+ &#39;services_provided&#39;: &#39;Vente de vehicules, reprise de vehicules, atelier &#39;
+                      &quot;d&#39;entretien, contrat de maintenance, vente de vehicules &quot;
+                      &#39;electriques&#39;}
 </pre></div>
 </div>
 <p>We see that all fields are extracted as desired! Let’s also observe the messaging
 sequence of Pydantic-AI:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 
 <span class="n">pprint</span><span class="p">(</span>
@@ -718,28 +752,31 @@ sequence of Pydantic-AI:</p>
                         &#39;Younited Credit leboncoin 2006 - 2025 Retrouvez-nous &#39;
                         &#39;sur version: release-2025-01-03.8701270&#39;,
              &#39;part_kind&#39;: &#39;user-prompt&#39;,
-             &#39;timestamp&#39;: &#39;2025-01-04T01:17:26.638153Z&#39;}]},
+             &#39;timestamp&#39;: &#39;2025-01-05T18:20:54.485857Z&#39;}]},
  {&#39;kind&#39;: &#39;response&#39;,
   &#39;parts&#39;: [{&#39;args&#39;: {&#39;args_json&#39;: &#39;{&quot;company_name&quot;: &quot;GARAGE HAMELIN&quot;, &#39;
                                    &#39;&quot;description&quot;: &quot;Vente de vehicules neufs &#39;
-                                   &#39;et occasions, entretien, reprise de &#39;
-                                   &#39;vehicules&quot;, &quot;services_provided&quot;: &quot;Vente de &#39;
-                                   &#39;vehicules, entretien, reprise de &#39;
-                                   &#39;vehicules, financement, extension de &#39;
-                                   &#39;garantie&quot;, &quot;number_of_cars&quot;: 60, &#39;
+                                   &#39;Renault et Dacia, vehicules occasions, &#39;
+                                   &quot;reprise de vehicules, atelier d&#39;entretien, &quot;
+                                   &#39;contrat de maintenance, vente de vehicules &#39;
+                                   &#39;electriques&quot;, &quot;services_provided&quot;: &quot;Vente &#39;
+                                   &#39;de vehicules, reprise de vehicules, &#39;
+                                   &quot;atelier d&#39;entretien, contrat de &quot;
+                                   &#39;maintenance, vente de vehicules &#39;
+                                   &#39;electriques&quot;, &quot;number_of_cars&quot;: 60, &#39;
                                    &#39;&quot;main_phone_number&quot;: &quot;04 68 52 63 33&quot;, &#39;
                                    &#39;&quot;country&quot;: &quot;France&quot;, &quot;city&quot;: &quot;Perpignan&quot;, &#39;
                                    &#39;&quot;full_address&quot;: &quot;335 RUE ARISTIDE BERGES - &#39;
                                    &#39;ESPACE POLYGONE NORD 66000 PERPIGNAN&quot;}&#39;},
              &#39;part_kind&#39;: &#39;tool-call&#39;,
-             &#39;tool_call_id&#39;: &#39;call_qsex&#39;,
+             &#39;tool_call_id&#39;: &#39;call_rcmz&#39;,
              &#39;tool_name&#39;: &#39;final_result&#39;}],
-  &#39;timestamp&#39;: &#39;2025-01-04T01:17:26Z&#39;},
+  &#39;timestamp&#39;: &#39;2025-01-05T18:20:54Z&#39;},
  {&#39;kind&#39;: &#39;request&#39;,
   &#39;parts&#39;: [{&#39;content&#39;: &#39;Final result processed.&#39;,
              &#39;part_kind&#39;: &#39;tool-return&#39;,
-             &#39;timestamp&#39;: &#39;2025-01-04T01:17:27.858448Z&#39;,
-             &#39;tool_call_id&#39;: &#39;call_qsex&#39;,
+             &#39;timestamp&#39;: &#39;2025-01-05T18:20:55.916232Z&#39;,
+             &#39;tool_call_id&#39;: &#39;call_rcmz&#39;,
              &#39;tool_name&#39;: &#39;final_result&#39;}]}]
 </pre></div>
 </div>
@@ -758,7 +795,7 @@ Pydantic model.</p></li>
 a closing message and returns the result.</p></li>
 </ol>
 <p>To quench our curiosity, here is the structured result tool passed to Groq:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
 
 <span class="n">pprint</span><span class="p">(</span><span class="n">agent_lbc</span><span class="o">.</span><span class="n">_result_schema</span><span class="o">.</span><span class="n">tool_defs</span><span class="p">())</span>
@@ -802,6 +839,9 @@ a closing message and returns the result.</p></li>
                 outer_typed_dict_key=None)]
 </pre></div>
 </div>
+</section>
+<section id="pappers">
+<h3>Pappers<a class="headerlink" href="#pappers" title="Link to this heading">#</a></h3>
 <p>The next step in our workflow is to enrich the information from LBC with financial
 data sourced from Pappers. This involves two LLM calls:</p>
 <ol class="arabic simple">
@@ -815,17 +855,17 @@ prompt the LLM to extract the desired financial information.</p></li>
 <img alt="../_images/pappers_list.png" src="../_images/pappers_list.png" />
 <p>Notice that the company we are searching for – located in Perpignan – is the third
 entry on the list!</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urljoin</span>
 
 <span class="n">PAPPERS_BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://www.pappers.fr/&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">make_pappers_search_url</span><span class="p">(</span><span class="n">company_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_pappers_search_url</span><span class="p">(</span><span class="n">company_name</span><span class="p">):</span>
     <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">company_name</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">PAPPERS_BASE_URL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;recherche?q=</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">make_pappers_company_url</span><span class="p">(</span><span class="n">company_href</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_pappers_company_url</span><span class="p">(</span><span class="n">company_href</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">PAPPERS_BASE_URL</span><span class="p">,</span> <span class="n">company_href</span><span class="p">)</span>
 
 
@@ -837,14 +877,14 @@ entry on the list!</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/recherche?q=GARAGE+HAMELIN
-character numbers: 15,477
+character count: 15,477
 
 &lt;html lang=&quot;fr&quot;&gt;
 &lt;body&gt;
 &lt;!-- Google Tag Manager (noscript) --&gt;
 &lt;noscript&gt;&lt;iframe height=&quot;0&quot; src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-TQ4QRT9&quot; width=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/noscript&gt;
 &lt;!-- End Google Tag Manager (noscript) --&gt;
-&lt;div data-v-app=&quot;&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div data-v-2dbfa415=&quot;&quot;&gt;&lt;form action=&quot;/recherche&quot;&gt;&lt;div&gt;&lt;input autocapitalize=&quot;off&quot; autocomplete=&quot;off&quot; autocorrect=&quot;off&quot; placeholder=&quot;Entreprise, N° SIREN, Dirigeant, Mot-clé...&quot; spellcheck=&quot;false&quot; type=&quot;search&quot;/&gt;&lt;div&gt;&lt;div&gt;&lt;!--v-if--&gt;&lt;div&gt;&lt;button aria-disabled=&quot;false&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt; Rechercher des entreprises &lt;/span&gt;&lt;/button&gt;&lt;button aria-controls=&quot;el-id-3460-1&quot; aria-disabled=&quot;false&quot; aria-expanded=&quot;false&quot; aria-haspopup=&quot;menu&quot; aria-label=&quot;el.dropdown.toggleDropdown&quot; role=&quot;button&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div data-v-2d2f0904=&quot;&quot;&gt;&lt;a data-v-2d2f0904=&quot;&quot; href=&quot;#&quot;&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/form&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;p data-v-86957346=&quot;&quot;&gt;Filtrer par :&lt;/p&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;En activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Département&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Forme juridique&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Capital social&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Plus de filtres&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Résultats Trouvés&lt;/p&gt;&lt;p&gt;10 entreprises&lt;span&gt; correspondent à votre requête&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;#&quot;&gt;Exporter les résultats &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;GARAGE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SARL, société à responsabilité limitée&lt;/p&gt;&lt;p&gt;Depuis le 01/04/1989&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;JOUE-LES-TOURS&lt;/p&gt;&lt;p&gt;Code postal : 37300&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 1 et 2 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;7 622,45 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 17 publications sur 17&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;02/06/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Tours
+&lt;div data-v-app=&quot;&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div data-v-2dbfa415=&quot;&quot;&gt;&lt;form action=&quot;/recherche&quot;&gt;&lt;div&gt;&lt;input autocapitalize=&quot;off&quot; autocomplete=&quot;off&quot; autocorrect=&quot;off&quot; placeholder=&quot;Entreprise, N° SIREN, Dirigeant, Mot-clé...&quot; spellcheck=&quot;false&quot; type=&quot;search&quot;/&gt;&lt;div&gt;&lt;div&gt;&lt;!--v-if--&gt;&lt;div&gt;&lt;button aria-disabled=&quot;false&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt; Rechercher des entreprises &lt;/span&gt;&lt;/button&gt;&lt;button aria-controls=&quot;el-id-1572-1&quot; aria-disabled=&quot;false&quot; aria-expanded=&quot;false&quot; aria-haspopup=&quot;menu&quot; aria-label=&quot;el.dropdown.toggleDropdown&quot; role=&quot;button&quot; tabindex=&quot;0&quot; type=&quot;button&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;&lt;i&gt;&lt;/i&gt;&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div data-v-2d2f0904=&quot;&quot;&gt;&lt;a data-v-2d2f0904=&quot;&quot; href=&quot;#&quot;&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/form&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;p data-v-86957346=&quot;&quot;&gt;Filtrer par :&lt;/p&gt;&lt;div data-v-86957346=&quot;&quot;&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;En activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Département&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Forme juridique&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Activité&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Capital social&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;span&gt;Plus de filtres&lt;/span&gt;&lt;/button&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Résultats Trouvés&lt;/p&gt;&lt;p&gt;10 entreprises&lt;span&gt; correspondent à votre requête&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;#&quot;&gt;Exporter les résultats &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-350694584&quot;&gt;GARAGE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SARL, société à responsabilité limitée&lt;/p&gt;&lt;p&gt;Depuis le 01/04/1989&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;JOUE-LES-TOURS&lt;/p&gt;&lt;p&gt;Code postal : 37300&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 1 et 2 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;7 622,45 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 17 publications sur 17&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;02/06/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Tours
 Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; &lt;em&gt;HAMELIN&lt;/em&gt;
 Forme juridique : Société à responsabilité limitée
 Adresse&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-533619425&quot;&gt;&lt;button&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/a&gt;&lt;div&gt;&lt;a href=&quot;/entreprise/garage-hamelin-533619425&quot;&gt;GARAGE HAMELIN&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Forme Juridique&lt;/p&gt;&lt;p&gt;SARL, société à responsabilité limitée&lt;/p&gt;&lt;p&gt;Depuis le 12/07/2011&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Activité&lt;/p&gt;&lt;p&gt;Entretien et réparation de véhicules automobiles légers&lt;/p&gt;&lt;p&gt;Code NAF : 45.20A&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Lieu&lt;/p&gt;&lt;p&gt;SAINT-SAUVEUR-LE-VICOMTE&lt;/p&gt;&lt;p&gt;Code postal : 50390&lt;/p&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Effectif : &lt;span&gt;Entre 1 et 2 salariés&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Capital : &lt;span&gt;5 000,00 €&lt;/span&gt;&lt;/p&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;!-- --&gt;&lt;div&gt;&lt;h2&gt;&lt;i&gt;&lt;/i&gt;Mentionné dans 14 publications sur 14&lt;/h2&gt;&lt;div&gt;&lt;div&gt;&lt;p&gt;Type d&#39;annonce&lt;/p&gt;&lt;p&gt;&lt;span&gt;Dépôt des comptes&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Date&lt;/p&gt;&lt;p&gt;22/01/2014&lt;/p&gt;&lt;/div&gt;&lt;div&gt;&lt;p&gt;Extrait&lt;!-- --&gt; de mention&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;div&gt; de Cherbourg
@@ -866,7 +906,7 @@ Dénomination : &lt;em&gt;GARAGE&lt;/em&gt; DES RONCHETTES
 Forme juridique : Société par actions simplifiée&lt;/div&gt;&lt;/span&gt;&lt;span&gt;&lt;div&gt;
 Administration : Président : &lt;em&gt;HAMELIN&lt;/em&gt; Christophe, Jean-Yves, Sébastien Dirigeant en France d&#39;une personne&lt;/div&gt;&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;div&gt;&lt;a&gt;Exporter les résultats &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;!-- --&gt;&lt;/div&gt;&lt;footer&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;a href=&quot;/&quot;&gt;&lt;img alt=&quot;Logo Pappers Entreprises&quot; src=&quot;https://www.pappers.fr/img/logo-pappers-entreprises-white.svg&quot;/&gt;&lt;/a&gt;&lt;/div&gt;&lt;div&gt;&lt;a aria-label=&quot;LinkedIn&quot; href=&quot;https://www.linkedin.com/company/pappers/&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;a aria-label=&quot;Partager sur Facebook&quot; href=&quot;http://www.facebook.com/sharer.php?u=https://www.pappers.fr/&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;a aria-label=&quot;Twitter&quot; href=&quot;https://twitter.com/get_pappers&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Ressources &lt;p&gt;&lt;a href=&quot;/presse&quot;&gt;Presse&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/classements&quot;&gt;Classements &lt;i&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;/classements/entreprises-chiffre-affaires&quot;&gt;des entreprises par chiffre d&#39;affaires&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;/classements/entreprises-rentables&quot;&gt;des entreprises par résultat net&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;/tendances/classement/semaine&quot;&gt;des entreprises par popularité&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href=&quot;/annuaire&quot;&gt;Annuaire&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/guide&quot;&gt;Blog&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Informations légales &lt;p&gt;&lt;a href=&quot;/politique-de-protection-des-donnees-personnelles&quot;&gt;Données personnelles&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/mentions-legales&quot;&gt;Mentions légales&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;Nous connaître &lt;p&gt;&lt;a href=&quot;/a-propos&quot;&gt;A propos&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/faq&quot;&gt;FAQ&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/contact&quot;&gt;Contact&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;p&gt;Nos données sont constamment actualisées, entièrement gratuites et proviennent de l&#39;INSEE, l&#39;INPI et du BODACC.&lt;/p&gt;&lt;div&gt;&lt;p&gt;Inscrivez-vous à la newsletter mensuelle :&lt;/p&gt;&lt;fieldset&gt;&lt;input autocomplete=&quot;email&quot; placeholder=&quot;E-mail&quot; required=&quot;&quot; type=&quot;email&quot;/&gt;&lt;button disabled=&quot;&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/button&gt;&lt;/fieldset&gt;&lt;fieldset&gt;&lt;input type=&quot;checkbox&quot;/&gt;&lt;label for=&quot;cgu-newsletter&quot;&gt; En vous inscrivant, vous acceptez la &lt;a href=&quot;/politique-de-protection-des-donnees-personnelles&quot; target=&quot;_blank&quot;&gt;&lt;u&gt;Politique générale de Protection des Données&lt;/u&gt;&lt;/a&gt;. &lt;/label&gt;&lt;/fieldset&gt;&lt;/div&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;/footer&gt;&lt;/div&gt;
 
-&lt;div&gt;&lt;div aria-hidden=&quot;true&quot; data-popper-escaped=&quot;false&quot; data-popper-placement=&quot;bottom&quot; data-popper-reference-hidden=&quot;false&quot; tabindex=&quot;-1&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;ul aria-labelledby=&quot;el-id-3460-0&quot; role=&quot;menu&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des entreprises&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des dirigeants&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;true&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;Rechercher des bénéficiaires effectifs&lt;/span&gt;&lt;div data-v-3f44af78=&quot;&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des documents&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des publications&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des marques&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span data-popper-arrow=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;!--v-if--&gt;&lt;/div&gt;
+&lt;div&gt;&lt;div aria-hidden=&quot;true&quot; data-popper-escaped=&quot;false&quot; data-popper-placement=&quot;bottom&quot; data-popper-reference-hidden=&quot;false&quot; tabindex=&quot;-1&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;div&gt;&lt;ul aria-labelledby=&quot;el-id-1572-0&quot; role=&quot;menu&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des entreprises&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des dirigeants&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;true&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;&lt;span&gt;Rechercher des bénéficiaires effectifs&lt;/span&gt;&lt;div data-v-3f44af78=&quot;&quot;&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des documents&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des publications&lt;/li&gt;&lt;!--v-if--&gt;&lt;li aria-disabled=&quot;false&quot; data-el-collection-item=&quot;&quot; role=&quot;menuitem&quot; tabindex=&quot;-1&quot;&gt;&lt;!--v-if--&gt;Rechercher des marques&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;span data-popper-arrow=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;!--v-if--&gt;&lt;/div&gt;
 &lt;link crossorigin=&quot;anonymous&quot; href=&quot;https://use.fontawesome.com/releases/v5.8.1/css/all.css&quot; integrity=&quot;sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf&quot; rel=&quot;stylesheet&quot;/&gt;
 &lt;/body&gt;&lt;/html&gt;
 </pre></div>
@@ -876,7 +916,7 @@ to the company we are looking for. Keeping the HTML list structure helps the LLM
 distinguish between the different items more effectively.</p>
 <p>The downside is that the user prompt becomes quite large, exceeding 15,000 characters.
 This increases inference costs and requires using an LLM with a large context window.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CompanyHref</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CompanyHref</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">href</span><span class="p">:</span> <span class="nb">str</span>
 
 <span class="n">system_prompt_href</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -914,7 +954,7 @@ company’s Pappers page.</p>
     <span class="n">pappers_company_url</span><span class="p">,</span> <span class="n">static_page</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">text_only</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">FinancialInfo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FinancialInfo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">owner_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">owner_age</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">turnover</span><span class="p">:</span> <span class="nb">int</span>
@@ -933,10 +973,10 @@ company’s Pappers page.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>https://www.pappers.fr/entreprise/garage-hamelin-ghd-409871969
-{&#39;owner_age&#39;: &#39;None&#39;,
+{&#39;owner_age&#39;: &#39;null&#39;,
  &#39;owner_name&#39;: &#39;LUCA HOLDING&#39;,
  &#39;social_capital&#39;: 55250,
- &#39;turnover&#39;: 362000}
+ &#39;turnover&#39;: 225000}
 </pre></div>
 </div>
 <p>Finally, we store the output in a database and synchronize the lead with our CRM.</p>
@@ -947,30 +987,32 @@ company’s Pappers page.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;city&#39;: &#39;Perpignan&#39;,
  &#39;company_name&#39;: &#39;GARAGE HAMELIN&#39;,
  &#39;country&#39;: &#39;France&#39;,
- &#39;description&#39;: &#39;Vente de vehicules neufs et occasions, entretien, reprise de &#39;
-                &#39;vehicules&#39;,
+ &#39;description&#39;: &#39;Vente de vehicules neufs Renault et Dacia, vehicules &#39;
+                &quot;occasions, reprise de vehicules, atelier d&#39;entretien, contrat &quot;
+                &#39;de maintenance, vente de vehicules electriques&#39;,
  &#39;full_address&#39;: &#39;335 RUE ARISTIDE BERGES - ESPACE POLYGONE NORD 66000 &#39;
                  &#39;PERPIGNAN&#39;,
  &#39;main_phone_number&#39;: &#39;04 68 52 63 33&#39;,
  &#39;number_of_cars&#39;: 60,
- &#39;owner_age&#39;: &#39;None&#39;,
+ &#39;owner_age&#39;: &#39;null&#39;,
  &#39;owner_name&#39;: &#39;LUCA HOLDING&#39;,
- &#39;services_provided&#39;: &#39;Vente de vehicules, entretien, reprise de vehicules, &#39;
-                      &#39;financement, extension de garantie&#39;,
+ &#39;services_provided&#39;: &#39;Vente de vehicules, reprise de vehicules, atelier &#39;
+                      &quot;d&#39;entretien, contrat de maintenance, vente de vehicules &quot;
+                      &#39;electriques&#39;,
  &#39;social_capital&#39;: 55250,
- &#39;turnover&#39;: 362000}
+ &#39;turnover&#39;: 225000}
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 0.594 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-scraping-workflow-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 5.139 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-01-scraping-workflow-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/b32420cf16f2ef3e676c979b1cf4b92f/plot_scraping_workflow.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_scraping_workflow.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/1f9fd5595789437ff2cf6805cc5480ca/plot_01_scraping_workflow.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_01_scraping_workflow.ipynb</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/f7aaa2e1952df88cccc9cf7a789f4961/plot_scraping_workflow.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_scraping_workflow.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/4166a9eb846a257a78c061524cecb4c2/plot_01_scraping_workflow.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_01_scraping_workflow.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-zip docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/016032702095361ad215e6d620c97034/plot_scraping_workflow.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_scraping_workflow.zip</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/299b0b939d90f2b30249ea3f05296128/plot_01_scraping_workflow.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_01_scraping_workflow.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -996,6 +1038,15 @@ company’s Pappers page.</p>
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title">Examples</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="plot_02_rag_agent.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">RAG Agent</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -1023,6 +1074,11 @@ company’s Pappers page.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow">Workflow</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lbc">LBC</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pappers">Pappers</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -1030,7 +1086,7 @@ company’s Pappers page.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/auto_examples/plot_scraping_workflow.rst.txt"
+      <li><a href="../_sources/auto_examples/plot_01_scraping_workflow.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>
@@ -1041,8 +1097,8 @@ company’s Pappers page.</p>
   <div class="sphx-glr-sidebar-component">
     
       
-        <div class="sphx-glr-sidebar-item sphx-glr-download-python-sidebar" title="plot_scraping_workflow.py">
-          <a download href="../_downloads/f7aaa2e1952df88cccc9cf7a789f4961/plot_scraping_workflow.py">
+        <div class="sphx-glr-sidebar-item sphx-glr-download-python-sidebar" title="plot_01_scraping_workflow.py">
+          <a download href="../_downloads/4166a9eb846a257a78c061524cecb4c2/plot_01_scraping_workflow.py">
             <i class="fa-solid fa-download"></i>
             Download source code
           </a>
@@ -1050,8 +1106,8 @@ company’s Pappers page.</p>
       
     
       
-        <div class="sphx-glr-sidebar-item sphx-glr-download-jupyter-sidebar" title="plot_scraping_workflow.ipynb">
-          <a download href="../_downloads/b32420cf16f2ef3e676c979b1cf4b92f/plot_scraping_workflow.ipynb">
+        <div class="sphx-glr-sidebar-item sphx-glr-download-jupyter-sidebar" title="plot_01_scraping_workflow.ipynb">
+          <a download href="../_downloads/1f9fd5595789437ff2cf6805cc5480ca/plot_01_scraping_workflow.ipynb">
             <i class="fa-solid fa-download"></i>
             Download Jupyter notebook
           </a>
@@ -1059,8 +1115,8 @@ company’s Pappers page.</p>
       
     
       
-        <div class="sphx-glr-sidebar-item sphx-glr-download-zip-sidebar" title="plot_scraping_workflow.zip">
-          <a download href="../_downloads/016032702095361ad215e6d620c97034/plot_scraping_workflow.zip">
+        <div class="sphx-glr-sidebar-item sphx-glr-download-zip-sidebar" title="plot_01_scraping_workflow.zip">
+          <a download href="../_downloads/299b0b939d90f2b30249ea3f05296128/plot_01_scraping_workflow.zip">
             <i class="fa-solid fa-download"></i>
             Download zipped
           </a>
